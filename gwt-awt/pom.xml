@@ -13,6 +13,17 @@
 		</dependency>
 	</dependencies>
 
+  <distributionManagement>
+    <repository>
+      <id>maven2.releases.levigo.de</id>
+      <url>https://levigo.de/maven2/content/repositories/levigo-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>maven2.snapshots.levigo.de</id>
+      <url>https://levigo.de/maven2/content/repositories/levigo-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 	<build>
 		<plugins>
 			<plugin>
