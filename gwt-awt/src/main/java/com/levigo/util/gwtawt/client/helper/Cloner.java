@@ -1,4 +1,4 @@
-package com.levigo.util.gwtawt.helper;
+package com.levigo.util.gwtawt.client.helper;
 
 public class Cloner {
   public static float[] clone(float[] obj) {

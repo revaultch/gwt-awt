@@ -28,7 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.io.Serializable;
 
-import com.levigo.util.gwtawt.helper.Arrays;
+import com.levigo.util.gwtawt.client.helper.Arrays;
 
 /**
  * The <code>CubicCurve2D</code> class defines a cubic parametric curve segment in {@code (x,y)}
@@ -1063,7 +1063,7 @@ public abstract class CubicCurve2D implements Shape, Cloneable {
 
       num = 1;
 
-      double err = 1200000000 * com.levigo.util.gwtawt.helper.Math.ulp(abs(uv) + abs(sub));
+      double err = 1200000000 * com.levigo.util.gwtawt.client.helper.Math.ulp(abs(uv) + abs(sub));
       if (iszero(D, err) || within(u, v, err)) {
         if (res == eqn) {
           eqn = Arrays.copyOf(eqn, 4);
@@ -1185,7 +1185,7 @@ public abstract class CubicCurve2D implements Shape, Cloneable {
       double x = abs(x1 - goodRoot) > abs(x2 - goodRoot) ? x1 : x2;
       double fx = solveEqn(eqn, 3, x);
 
-      if (iszero(fx, 10000000 * com.levigo.util.gwtawt.helper.Math.ulp(x))) {
+      if (iszero(fx, 10000000 * com.levigo.util.gwtawt.client.helper.Math.ulp(x))) {
         double badRootVal = solveEqn(eqn, 3, badRoot);
         res[1] = abs(badRootVal) < abs(fx) ? badRoot : x;
         return 2;
@@ -1216,7 +1216,7 @@ public abstract class CubicCurve2D implements Shape, Cloneable {
 
       t = newt;
     }
-    if (within(t, origt, 1000 * com.levigo.util.gwtawt.helper.Math.ulp(origt)) && inInterval(t, min, max)) {
+    if (within(t, origt, 1000 * com.levigo.util.gwtawt.client.helper.Math.ulp(origt)) && inInterval(t, min, max)) {
       return t;
     }
     return origt;
@@ -1309,7 +1309,7 @@ public abstract class CubicCurve2D implements Shape, Cloneable {
     double c = eqn[0];
 
     double M = 1 + max(max(abs(a), abs(b)), abs(c)) / abs(d);
-    M += com.levigo.util.gwtawt.helper.Math.ulp(M) + 1;
+    M += com.levigo.util.gwtawt.client.helper.Math.ulp(M) + 1;
     return M;
   }
 

@@ -22,7 +22,7 @@
 
 package java.awt;
 
-import com.levigo.util.gwtawt.helper.Cloner;
+import com.levigo.util.gwtawt.client.helper.Cloner;
 
 
 /**

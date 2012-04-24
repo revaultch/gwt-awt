@@ -26,7 +26,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.io.Serializable;
 
-import com.levigo.util.gwtawt.helper.Arrays;
+import com.levigo.util.gwtawt.client.helper.Arrays;
 
 /**
  * The {@code Path2D} class provides a simple, yet flexible shape which represents an arbitrary

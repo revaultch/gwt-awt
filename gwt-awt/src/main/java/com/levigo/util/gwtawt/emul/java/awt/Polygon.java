@@ -29,7 +29,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import com.levigo.util.gwtawt.helper.Arrays;
+import com.levigo.util.gwtawt.client.helper.Arrays;
 
 /**
  * The <code>Polygon</code> class encapsulates a description of a

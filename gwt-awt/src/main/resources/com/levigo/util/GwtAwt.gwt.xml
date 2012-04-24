@@ -3,5 +3,5 @@
 <module>
   <inherits name="com.levigo.util.gwtawt.emul.Emul"/>
   
-  <source path="gwtawt/helper"/>
+  <source path="gwtawt/client"/>
 </module>
