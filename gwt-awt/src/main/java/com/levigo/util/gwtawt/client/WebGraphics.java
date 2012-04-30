@@ -107,7 +107,7 @@ public class WebGraphics {
 
   private void path(Shape shape) {
     PathIterator i = shape.getPathIterator(null);
-    float[] coords = new float[4];
+    float[] coords = new float[6];
     context.beginPath();
     while (!i.isDone()) {
       int segment = i.currentSegment(coords);
