@@ -422,18 +422,18 @@ public abstract class Ellipse2D extends RectangularShape {
         return new EllipseIterator(this, at);
     }
 
-    /**
-     * Returns the hashcode for this <code>Ellipse2D</code>.
-     * @return the hashcode for this <code>Ellipse2D</code>.
-     * @since 1.6
-     */
-    public int hashCode() {
-        long bits = java.lang.Double.doubleToLongBits(getX());
-        bits += java.lang.Double.doubleToLongBits(getY()) * 37;
-        bits += java.lang.Double.doubleToLongBits(getWidth()) * 43;
-        bits += java.lang.Double.doubleToLongBits(getHeight()) * 47;
-        return (((int) bits) ^ ((int) (bits >> 32)));
-    }
+//    /**
+//     * Returns the hashcode for this <code>Ellipse2D</code>.
+//     * @return the hashcode for this <code>Ellipse2D</code>.
+//     * @since 1.6
+//     */
+//    public int hashCode() {
+//        long bits = java.lang.Double.doubleToLongBits(getX());
+//        bits += java.lang.Double.doubleToLongBits(getY()) * 37;
+//        bits += java.lang.Double.doubleToLongBits(getWidth()) * 43;
+//        bits += java.lang.Double.doubleToLongBits(getHeight()) * 47;
+//        return (((int) bits) ^ ((int) (bits >> 32)));
+//    }
 
     /**
      * Determines whether or not the specified <code>Object</code> is
