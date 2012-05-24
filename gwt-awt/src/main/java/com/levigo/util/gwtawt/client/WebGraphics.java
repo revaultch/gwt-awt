@@ -173,7 +173,10 @@ public class WebGraphics implements Graphics {
   }
 
   private void path(Shape shape) {
-    PathIterator i = shape.getPathIterator(null);
+    path(shape.getPathIterator(null));
+  }
+
+  private void path(PathIterator i) {
     float[] coords = new float[6];
     context.beginPath();
     while (!i.isDone()) {
