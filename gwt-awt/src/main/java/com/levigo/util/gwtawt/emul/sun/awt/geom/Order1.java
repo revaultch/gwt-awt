@@ -1,14 +1,12 @@
-package sun.awt.geom;
-
 /*
- * Copyright 1998-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1998, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -20,16 +18,16 @@ package sun.awt.geom;
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
+package sun.awt.geom;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.PathIterator;
 import java.util.Vector;
-import java.lang.Math;
 
 final class Order1 extends Curve {
     private double x0;
@@ -224,11 +222,13 @@ final class Order1 extends Curve {
         }
         Order1 c1 = (Order1) other;
         if (yrange[1] <= yrange[0]) {
-            throw new InternalError("yrange already screwed up...");
+          throw new RuntimeException("yrange already screwed up...");
+//            throw new InternalError("yrange already screwed up...");
         }
         yrange[1] = Math.min(Math.min(yrange[1], y1), c1.y1);
         if (yrange[1] <= yrange[0]) {
-            throw new InternalError("backstepping from "+yrange[0]+" to "+yrange[1]);
+            throw new RuntimeException("backstepping from "+yrange[0]+" to "+yrange[1]);
+//            throw new InternalError("backstepping from "+yrange[0]+" to "+yrange[1]);
         }
         if (xmax <= c1.xmin) {
             return (xmin == c1.xmax) ? 0 : -1;

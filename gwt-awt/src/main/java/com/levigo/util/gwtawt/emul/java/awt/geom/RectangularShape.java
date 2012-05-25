@@ -373,9 +373,9 @@ public abstract class RectangularShape implements Shape, Cloneable {
      *          the <code>Shape</code> object's flattened geometry.
      * @since 1.2
      */
-    public PathIterator getPathIterator(AffineTransform at, double flatness) {
-        return new FlatteningPathIterator(getPathIterator(at), flatness);
-    }
+//    public PathIterator getPathIterator(AffineTransform at, double flatness) {
+//        return new FlatteningPathIterator(getPathIterator(at), flatness);
+//    }
 
 //    /**
 //     * Creates a new object of the same class and with the same

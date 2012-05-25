@@ -54,7 +54,7 @@ import com.levigo.util.gwtawt.client.helper.Arrays;
  * @author Jim Graham
  * @since 1.6
  */
-public abstract class Path2D implements Shape, Cloneable {
+public abstract class Path2D implements Shape/*, Cloneable*/ {
   /**
    * An even-odd winding rule for determining the interior of a path.
    * 
@@ -185,9 +185,9 @@ public abstract class Path2D implements Shape, Cloneable {
      * @param s the specified {@code Shape} object
      * @since 1.6
      */
-    public Float(Shape s) {
-      this(s, null);
-    }
+//    public Float(Shape s) {
+//      this(s, null);
+//    }
 
     /**
      * Constructs a new single precision {@code Path2D} object from an arbitrary {@link Shape}
@@ -199,22 +199,22 @@ public abstract class Path2D implements Shape, Cloneable {
      * @param at the specified {@code AffineTransform} object
      * @since 1.6
      */
-    public Float(Shape s, AffineTransform at) {
-      if (s instanceof Path2D) {
-        Path2D p2d = (Path2D) s;
-        setWindingRule(p2d.windingRule);
-        this.numTypes = p2d.numTypes;
-        this.pointTypes = Arrays.copyOf(p2d.pointTypes, p2d.pointTypes.length);
-        this.numCoords = p2d.numCoords;
-        this.floatCoords = p2d.cloneCoordsFloat(at);
-      } else {
-        PathIterator pi = s.getPathIterator(at);
-        setWindingRule(pi.getWindingRule());
-        this.pointTypes = new byte[INIT_SIZE];
-        this.floatCoords = new float[INIT_SIZE * 2];
-        append(pi, false);
-      }
-    }
+//    public Float(Shape s, AffineTransform at) {
+//      if (s instanceof Path2D) {
+//        Path2D p2d = (Path2D) s;
+//        setWindingRule(p2d.windingRule);
+//        this.numTypes = p2d.numTypes;
+//        this.pointTypes = Arrays.copyOf(p2d.pointTypes, p2d.pointTypes.length);
+//        this.numCoords = p2d.numCoords;
+//        this.floatCoords = p2d.cloneCoordsFloat(at);
+//      } else {
+//        PathIterator pi = s.getPathIterator(at);
+//        setWindingRule(pi.getWindingRule());
+//        this.pointTypes = new byte[INIT_SIZE];
+//        this.floatCoords = new float[INIT_SIZE * 2];
+//        append(pi, false);
+//      }
+//    }
 
     float[] cloneCoordsFloat(AffineTransform at) {
       float ret[];
@@ -721,18 +721,18 @@ public abstract class Path2D implements Shape, Cloneable {
      * @see java.lang.Cloneable
      * @since 1.6
      */
-    public final Object clone() {
-      // Note: It would be nice to have this return Path2D
-      // but one of our subclasses (GeneralPath) needs to
-      // offer "public Object clone()" for backwards
-      // compatibility so we cannot restrict it further.
-      // REMIND: Can we do both somehow?
-      if (this instanceof GeneralPath) {
-        return new GeneralPath(this);
-      } else {
-        return new Path2D.Float(this);
-      }
-    }
+//    public final Object clone() {
+//      // Note: It would be nice to have this return Path2D
+//      // but one of our subclasses (GeneralPath) needs to
+//      // offer "public Object clone()" for backwards
+//      // compatibility so we cannot restrict it further.
+//      // REMIND: Can we do both somehow?
+//      if (this instanceof GeneralPath) {
+//        return new GeneralPath(this);
+//      } else {
+//        return new Path2D.Float(this);
+//      }
+//    }
 
     /*
      * JDK 1.6 serialVersionUID
@@ -923,7 +923,6 @@ public abstract class Path2D implements Shape, Cloneable {
         return type;
       }
     }
-
   }
 
   /**
@@ -1427,14 +1426,14 @@ public abstract class Path2D implements Shape, Cloneable {
      * @see java.lang.Cloneable
      * @since 1.6
      */
-    public final Object clone() {
-      // Note: It would be nice to have this return Path2D
-      // but one of our subclasses (GeneralPath) needs to
-      // offer "public Object clone()" for backwards
-      // compatibility so we cannot restrict it further.
-      // REMIND: Can we do both somehow?
-      return new Path2D.Double(this);
-    }
+//    public final Object clone() {
+//      // Note: It would be nice to have this return Path2D
+//      // but one of our subclasses (GeneralPath) needs to
+//      // offer "public Object clone()" for backwards
+//      // compatibility so we cannot restrict it further.
+//      // REMIND: Can we do both somehow?
+//      return new Path2D.Double(this);
+//    }
 
     /*
      * JDK 1.6 serialVersionUID
@@ -1625,6 +1624,7 @@ public abstract class Path2D implements Shape, Cloneable {
         return type;
       }
     }
+
   }
 
   /**
@@ -1821,13 +1821,14 @@ public abstract class Path2D implements Shape, Cloneable {
    * @return a new {@code Shape}, transformed with the specified {@code AffineTransform}.
    * @since 1.6
    */
-  public final synchronized Shape createTransformedShape(AffineTransform at) {
-    Path2D p2d = (Path2D) clone();
-    if (at != null) {
-      p2d.transform(at);
-    }
-    return p2d;
-  }
+//  public final synchronized Shape createTransformedShape(AffineTransform at) {
+//    Path2D p2d = (Path2D) clone();
+//    
+//    if (at != null) {
+//      p2d.transform(at);
+//    }
+//    return p2d;
+//  }
 
   /**
    * {@inheritDoc}
@@ -2185,9 +2186,9 @@ public abstract class Path2D implements Shape, Cloneable {
    * 
    * @since 1.6
    */
-  public final PathIterator getPathIterator(AffineTransform at, double flatness) {
-    return new FlatteningPathIterator(getPathIterator(at), flatness);
-  }
+//  public final PathIterator getPathIterator(AffineTransform at, double flatness) {
+//    return new FlatteningPathIterator(getPathIterator(at), flatness);
+//  }
 
   /**
    * Creates a new object of the same class as this object.
@@ -2197,7 +2198,7 @@ public abstract class Path2D implements Shape, Cloneable {
    * @see java.lang.Cloneable
    * @since 1.6
    */
-  public abstract Object clone();
+//  public abstract Object clone();
 
   // Note: It would be nice to have this return Path2D
   // but one of our subclasses (GeneralPath) needs to

@@ -410,5 +410,5 @@ public interface Shape {
      *         a flattened view of the geometry of the  <code>Shape</code>.
      * @since 1.2
      */
-    public PathIterator getPathIterator(AffineTransform at, double flatness);
+    //public PathIterator getPathIterator(AffineTransform at, double flatness);
 }

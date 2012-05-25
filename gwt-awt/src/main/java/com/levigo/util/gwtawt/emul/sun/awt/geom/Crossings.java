@@ -1,4 +1,3 @@
-package sun.awt.geom;
 /*
  * Copyright (c) 1998, 2003, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -24,10 +23,11 @@ package sun.awt.geom;
  * questions.
  */
 
+package sun.awt.geom;
+
 import java.awt.geom.PathIterator;
 import java.util.Vector;
 import java.util.Enumeration;
-import java.lang.Math;
 
 public abstract class Crossings {
     public static final boolean debug = false;

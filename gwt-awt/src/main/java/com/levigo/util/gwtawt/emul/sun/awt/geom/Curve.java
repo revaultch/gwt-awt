@@ -880,7 +880,8 @@ public abstract class Curve {
             System.err.println("this == "+this);
             System.err.println("that == "+that);
             System.out.println("target range = "+yrange[0]+"=>"+yrange[1]);
-            throw new InternalError("backstepping from "+yrange[0]+" to "+y1);
+            throw new RuntimeException("backstepping from "+yrange[0]+" to "+y1);
+//            throw new InternalError("backstepping from "+yrange[0]+" to "+y1);
         }
         yrange[1] = y1;
         if (this.getXMax() <= that.getXMin()) {
@@ -1071,7 +1072,8 @@ public abstract class Curve {
             if (s == s0 || s == s1) {
                 System.out.println("s0 = "+s0);
                 System.out.println("s1 = "+s1);
-                throw new InternalError("no s progress!");
+                throw new RuntimeException("no s progress!");
+//                throw new InternalError("no s progress!");
             }
             if (t1 - t0 > TMIN) {
                 double t = (t0 + t1) / 2;
@@ -1080,7 +1082,8 @@ public abstract class Curve {
                 if (t == t0 || t == t1) {
                     System.out.println("t0 = "+t0);
                     System.out.println("t1 = "+t1);
-                    throw new InternalError("no t progress!");
+                    throw new RuntimeException("no t progress!");
+//                    throw new InternalError("no t progress!");
                 }
                 if (ys >= yt0 && yt >= ys0) {
                     if (findIntersect(that, yrange, ymin, slevel+1, tlevel+1,
@@ -1133,7 +1136,8 @@ public abstract class Curve {
             if (t == t0 || t == t1) {
                 System.out.println("t0 = "+t0);
                 System.out.println("t1 = "+t1);
-                throw new InternalError("no t progress!");
+                throw new RuntimeException("no t progress!");
+//                throw new InternalError("no t progress!");
             }
             if (yt >= ys0) {
                 if (findIntersect(that, yrange, ymin, slevel, tlevel+1,

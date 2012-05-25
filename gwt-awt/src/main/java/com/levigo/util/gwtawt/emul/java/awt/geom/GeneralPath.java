@@ -101,9 +101,9 @@ public final class GeneralPath extends Path2D.Float {
      * @param s the specified <code>Shape</code> object
      * @since 1.2
      */
-    public GeneralPath(Shape s) {
-        super(s, null);
-    }
+//    public GeneralPath(Shape s) {
+//        super(s, null);
+//    }
 
     GeneralPath(int windingRule,
                 byte[] pointTypes,

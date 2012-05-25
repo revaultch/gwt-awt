@@ -96,7 +96,7 @@ import sun.awt.geom.AreaOp;
  *
  * @since 1.2
  */
-public class Area implements Shape, Cloneable {
+public class Area implements Shape/*, Cloneable*/ {
     private static Vector EmptyCurves = new Vector();
 
     private Vector curves;
@@ -123,7 +123,9 @@ public class Area implements Shape, Cloneable {
         if (s instanceof Area) {
             curves = ((Area) s).curves;
         } else {
-            curves = pathToCurves(s.getPathIterator(null));
+          System.err.println("das sind shapes");
+          throw new RuntimeException("das sind shapes");
+//            curves = pathToCurves(s.getPathIterator(null));
         }
     }
 
@@ -478,14 +480,14 @@ public class Area implements Shape, Cloneable {
         return getCachedBounds().getBounds();
     }
 
-    /**
-     * Returns an exact copy of this <code>Area</code> object.
-     * @return    Created clone object
-     * @since 1.2
-     */
-    public Object clone() {
-        return new Area(this);
-    }
+//    /**
+//     * Returns an exact copy of this <code>Area</code> object.
+//     * @return    Created clone object
+//     * @since 1.2
+//     */
+//    public Object clone() {
+//        return new Area(this);
+//    }
 
     /**
      * Tests whether the geometries of the two <code>Area</code> objects
@@ -497,19 +499,19 @@ public class Area implements Shape, Cloneable {
      *          <code>false</code> otherwise.
      * @since 1.2
      */
-    public boolean equals(Area other) {
-        // REMIND: A *much* simpler operation should be possible...
-        // Should be able to do a curve-wise comparison since all Areas
-        // should evaluate their curves in the same top-down order.
-        if (other == this) {
-            return true;
-        }
-        if (other == null) {
-            return false;
-        }
-        Vector c = new AreaOp.XorOp().calculate(this.curves, other.curves);
-        return c.isEmpty();
-    }
+//    public boolean equals(Area other) {
+//        // REMIND: A *much* simpler operation should be possible...
+//        // Should be able to do a curve-wise comparison since all Areas
+//        // should evaluate their curves in the same top-down order.
+//        if (other == this) {
+//            return true;
+//        }
+//        if (other == null) {
+//            return false;
+//        }
+//        Vector c = new AreaOp.XorOp().calculate(this.curves, other.curves);
+//        return c.isEmpty();
+//    }
 
     /**
      * Transforms the geometry of this <code>Area</code> using the specified
@@ -519,15 +521,15 @@ public class Area implements Shape, Cloneable {
      * @throws NullPointerException if <code>t</code> is null
      * @since 1.2
      */
-    public void transform(AffineTransform t) {
-        if (t == null) {
-            throw new NullPointerException("transform must not be null");
-        }
-        // REMIND: A simpler operation can be performed for some types
-        // of transform.
-        curves = pathToCurves(getPathIterator(t));
-        invalidateBounds();
-    }
+//    public void transform(AffineTransform t) {
+//        if (t == null) {
+//            throw new NullPointerException("transform must not be null");
+//        }
+//        // REMIND: A simpler operation can be performed for some types
+//        // of transform.
+//        curves = pathToCurves(getPathIterator(t));
+//        invalidateBounds();
+//    }
 
     /**
      * Creates a new <code>Area</code> object that contains the same
@@ -541,28 +543,28 @@ public class Area implements Shape, Cloneable {
      *           geometry.
      * @since 1.2
      */
-    public Area createTransformedArea(AffineTransform t) {
-        Area a = new Area(this);
-        a.transform(t);
-        return a;
-    }
+//    public Area createTransformedArea(AffineTransform t) {
+//        Area a = new Area(this);
+//        a.transform(t);
+//        return a;
+//    }
 
     /**
      * {@inheritDoc}
      * @since 1.2
      */
-    public boolean contains(double x, double y) {
-        if (!getCachedBounds().contains(x, y)) {
-            return false;
-        }
-        Enumeration enum_ = curves.elements();
-        int crossings = 0;
-        while (enum_.hasMoreElements()) {
-            Curve c = (Curve) enum_.nextElement();
-            crossings += c.crossingsFor(x, y);
-        }
-        return ((crossings & 1) == 1);
-    }
+//    public boolean contains(double x, double y) {
+//        if (!getCachedBounds().contains(x, y)) {
+//            return false;
+//        }
+//        Enumeration enum_ = curves.elements();
+//        int crossings = 0;
+//        while (enum_.hasMoreElements()) {
+//            Curve c = (Curve) enum_.nextElement();
+//            crossings += c.crossingsFor(x, y);
+//        }
+//        return ((crossings & 1) == 1);
+//    }
 
     /**
      * {@inheritDoc}
@@ -576,16 +578,16 @@ public class Area implements Shape, Cloneable {
      * {@inheritDoc}
      * @since 1.2
      */
-    public boolean contains(double x, double y, double w, double h) {
-        if (w < 0 || h < 0) {
-            return false;
-        }
-        if (!getCachedBounds().contains(x, y, w, h)) {
-            return false;
-        }
-        Crossings c = Crossings.findCrossings(curves, x, y, x+w, y+h);
-        return (c != null && c.covers(y, y+h));
-    }
+//    public boolean contains(double x, double y, double w, double h) {
+//        if (w < 0 || h < 0) {
+//            return false;
+//        }
+//        if (!getCachedBounds().contains(x, y, w, h)) {
+//            return false;
+//        }
+//        Crossings c = Crossings.findCrossings(curves, x, y, x+w, y+h);
+//        return (c != null && c.covers(y, y+h));
+//    }
 
     /**
      * {@inheritDoc}
@@ -599,16 +601,16 @@ public class Area implements Shape, Cloneable {
      * {@inheritDoc}
      * @since 1.2
      */
-    public boolean intersects(double x, double y, double w, double h) {
-        if (w < 0 || h < 0) {
-            return false;
-        }
-        if (!getCachedBounds().intersects(x, y, w, h)) {
-            return false;
-        }
-        Crossings c = Crossings.findCrossings(curves, x, y, x+w, y+h);
-        return (c == null || !c.isEmpty());
-    }
+//    public boolean intersects(double x, double y, double w, double h) {
+//        if (w < 0 || h < 0) {
+//            return false;
+//        }
+//        if (!getCachedBounds().intersects(x, y, w, h)) {
+//            return false;
+//        }
+//        Crossings c = Crossings.findCrossings(curves, x, y, x+w, y+h);
+//        return (c == null || !c.isEmpty());
+//    }
 
     /**
      * {@inheritDoc}
@@ -653,6 +655,24 @@ public class Area implements Shape, Cloneable {
      */
     public PathIterator getPathIterator(AffineTransform at, double flatness) {
         return new FlatteningPathIterator(getPathIterator(at), flatness);
+    }
+
+    @Override
+    public boolean contains(double x, double y) {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    @Override
+    public boolean intersects(double x, double y, double w, double h) {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    @Override
+    public boolean contains(double x, double y, double w, double h) {
+      // TODO Auto-generated method stub
+      return false;
     }
 }
 

@@ -87,7 +87,7 @@ import java.awt.Shape;
  * @author Jim Graham
  * @since 1.2
  */
-public class AffineTransform implements Cloneable, java.io.Serializable {
+public class AffineTransform implements /*Cloneable,*/ java.io.Serializable {
 
   /*
    * This constant is only useful for the cached type field. It indicates that the type has been
