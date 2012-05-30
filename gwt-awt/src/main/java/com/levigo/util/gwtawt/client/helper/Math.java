@@ -8,5 +8,5 @@ public class Math {
       return -d;
     return 0;
   }
-
-}
+ }
+  
