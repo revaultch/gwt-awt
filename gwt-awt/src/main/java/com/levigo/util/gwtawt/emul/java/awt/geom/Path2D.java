@@ -185,9 +185,9 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
      * @param s the specified {@code Shape} object
      * @since 1.6
      */
-//    public Float(Shape s) {
-//      this(s, null);
-//    }
+    public Float(Shape s) {
+      this(s, null);
+    }
 
     /**
      * Constructs a new single precision {@code Path2D} object from an arbitrary {@link Shape}
@@ -199,22 +199,22 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
      * @param at the specified {@code AffineTransform} object
      * @since 1.6
      */
-//    public Float(Shape s, AffineTransform at) {
-//      if (s instanceof Path2D) {
-//        Path2D p2d = (Path2D) s;
-//        setWindingRule(p2d.windingRule);
-//        this.numTypes = p2d.numTypes;
-//        this.pointTypes = Arrays.copyOf(p2d.pointTypes, p2d.pointTypes.length);
-//        this.numCoords = p2d.numCoords;
-//        this.floatCoords = p2d.cloneCoordsFloat(at);
-//      } else {
-//        PathIterator pi = s.getPathIterator(at);
-//        setWindingRule(pi.getWindingRule());
-//        this.pointTypes = new byte[INIT_SIZE];
-//        this.floatCoords = new float[INIT_SIZE * 2];
-//        append(pi, false);
-//      }
-//    }
+    public Float(Shape s, AffineTransform at) {
+      if (s instanceof Path2D) {
+        Path2D p2d = (Path2D) s;
+        setWindingRule(p2d.windingRule);
+        this.numTypes = p2d.numTypes;
+        this.pointTypes = Arrays.copyOf(p2d.pointTypes, p2d.pointTypes.length);
+        this.numCoords = p2d.numCoords;
+        this.floatCoords = p2d.cloneCoordsFloat(at);
+      } else {
+        PathIterator pi = s.getPathIterator(at);
+        setWindingRule(pi.getWindingRule());
+        this.pointTypes = new byte[INIT_SIZE];
+        this.floatCoords = new float[INIT_SIZE * 2];
+        append(pi, false);
+      }
+    }
 
     float[] cloneCoordsFloat(AffineTransform at) {
       float ret[];
