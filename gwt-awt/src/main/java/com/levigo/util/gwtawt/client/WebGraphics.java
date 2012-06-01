@@ -22,8 +22,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.Context2d.LineCap;
@@ -88,13 +90,28 @@ public class WebGraphics implements Graphics {
   public void setColor(Color color) {
     if (color != null) {
       // String colorString="#"+r+g+b;
+      float alpha = color.getAlpha() / 255f;
       String colorString = "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ", "
-          + color.getAlpha() / 255f + ")";
+          + alpha + ")";
+//      System.err.println("stroke alpha: "+color.getAlpha()+" gerechnet "+alpha);
 
-      context.setFillStyle(colorString);
+//      context.setFillStyle(colorString);
       context.setStrokeStyle(colorString);
     } else {
       System.out.println("Ignoring null-Color");
+    }
+  }
+  
+  @Override
+  public void setFillColor(Color color){
+    if (color != null) {
+      // String colorString="#"+r+g+b;
+      float alpha =(float) color.getAlpha() / 255f;
+//      System.err.println("fill alpha: "+color.getAlpha()+" gerechnet "+alpha);
+      
+      String colorString = "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ", "
+          + alpha + ")";
+    context.setFillStyle(colorString);
     }
   }
 
@@ -105,10 +122,11 @@ public class WebGraphics implements Graphics {
    */
   @Override
   public void setStroke(BasicStroke stroke) {
+    if(stroke != null){
     // TODO support for stroke pattern as soon ie is support stroke patterns
     if (stroke.getDashArray() != null) {
       System.err.println("stroke patterns aren't suppoted");
-      throw new IllegalArgumentException("Stroke patterns aren't supported");
+      //throw new IllegalArgumentException("Stroke patterns aren't supported");
     }
 
     context.setMiterLimit(stroke.getMiterLimit());
@@ -143,7 +161,7 @@ public class WebGraphics implements Graphics {
         System.err.println("unknown line cap type");
         throw new IllegalArgumentException("illegal line cap value");
     }
-
+    }
   }
 
   /*
@@ -156,7 +174,7 @@ public class WebGraphics implements Graphics {
     if (shape != null) {
       path(shape);
       context.stroke();
-    }
+    }else{System.err.println("dreckdreckdreck");}
   }
 
   /*
@@ -281,5 +299,17 @@ public class WebGraphics implements Graphics {
   @Override
   public void drawChars(char data[], int offset, int length, int x, int y) {
     drawString(new String(data, offset, length), x, y);
+  }
+
+  @Override
+  public void drawLine(double x, double y, double x2, double y2) {
+//    Rectangle rect = new Rectangle();
+//    rect.setRect(x,y,x2-x,y2-y);
+//    path(rect);
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x2, y2);
+    context.stroke();
+    
   }
 }

@@ -147,6 +147,10 @@ public interface Graphics {
    */
   public abstract void drawChars(char data[], int offset, int length, int x, int y);
 
+  public abstract void drawLine(double x, double y, double x2, double y2);
+
+  void setFillColor(Color color);
+
 //  /**
 //   * Draws the text given by the specified byte array, using this graphics context's current font
 //   * and color. The baseline of the first character is at position (<i>x</i>,&nbsp;<i>y</i>) in this
