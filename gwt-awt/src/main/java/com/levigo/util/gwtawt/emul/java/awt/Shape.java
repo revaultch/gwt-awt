@@ -30,6 +30,8 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * The <code>Shape</code> interface provides definitions for objects
  * that represent some form of geometric shape.  The <code>Shape</code>
@@ -75,7 +77,7 @@ import java.awt.geom.Rectangle2D;
  * @author Jim Graham
  * @since 1.2
  */
-public interface Shape {
+public interface Shape extends IsSerializable {
     /**
      * Returns an integer {@link Rectangle} that completely encloses the
      * <code>Shape</code>.  Note that there is no guarantee that the
