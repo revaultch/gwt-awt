@@ -710,25 +710,25 @@ public class Color implements /*Paint, */java.io.Serializable {
         return getClass().getName() + "[r=" + getRed() + ",g=" + getGreen() + ",b=" + getBlue() + "]";
     }
 
-//    /**
-//     * Converts a <code>String</code> to an integer and returns the
-//     * specified opaque <code>Color</code>. This method handles string
-//     * formats that are used to represent octal and hexadecimal numbers.
-//     * @param      nm a <code>String</code> that represents
-//     *                            an opaque color as a 24-bit integer
-//     * @return     the new <code>Color</code> object.
-//     * @see        java.lang.Integer#decode
-//     * @exception  NumberFormatException  if the specified string cannot
-//     *                      be interpreted as a decimal,
-//     *                      octal, or hexadecimal integer.
-//     * @since      JDK1.1
-//     */
-//    public static Color decode(String nm) throws NumberFormatException {
-//        Integer intval = Integer.decode(nm);
-//        int i = intval.intValue();
-//        return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF);
-//    }
-//
+    /**
+     * Converts a <code>String</code> to an integer and returns the
+     * specified opaque <code>Color</code>. This method handles string
+     * formats that are used to represent octal and hexadecimal numbers.
+     * @param      nm a <code>String</code> that represents
+     *                            an opaque color as a 24-bit integer
+     * @return     the new <code>Color</code> object.
+     * @see        java.lang.Integer#decode
+     * @exception  NumberFormatException  if the specified string cannot
+     *                      be interpreted as a decimal,
+     *                      octal, or hexadecimal integer.
+     * @since      JDK1.1
+     */
+    public static Color decode(String nm) throws NumberFormatException {
+        Integer intval = Integer.decode(nm);
+        int i = intval.intValue();
+        return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF);
+    }
+
 //    /**
 //     * Finds a color in the system properties.
 //     * <p>
