@@ -22,10 +22,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.Context2d.LineCap;
@@ -50,138 +48,101 @@ public class WebGraphics implements Graphics {
     this.component = component;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#forceRepaint()
-   */
   @Override
   public void forceRepaint() {
     if (component != null)
       component.repaint();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#getContext2d()
-   */
   @Override
   public Context2d getContext2d() {
     return context;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#translate(int, int)
-   */
   @Override
   public void translate(int x, int y) {
     context.translate(x, y);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#setColor(java.awt.Color)
-   */
+
+  private String convert(Color color, float alpha) {
+    return "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ", " + alpha + ")";
+  }
+
   @Override
   public void setColor(Color color) {
     if (color != null) {
-      // String colorString="#"+r+g+b;
       float alpha = color.getAlpha() / 255f;
-      String colorString = "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ", "
-          + alpha + ")";
-//      System.err.println("stroke alpha: "+color.getAlpha()+" gerechnet "+alpha);
-
-//      context.setFillStyle(colorString);
+      String colorString = convert(color, alpha);
       context.setStrokeStyle(colorString);
     } else {
       System.out.println("Ignoring null-Color");
     }
   }
-  
+
   @Override
-  public void setFillColor(Color color){
+  public void setFillColor(Color color) {
     if (color != null) {
-      // String colorString="#"+r+g+b;
-      float alpha =(float) color.getAlpha() / 255f;
-//      System.err.println("fill alpha: "+color.getAlpha()+" gerechnet "+alpha);
-      
-      String colorString = "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ", "
-          + alpha + ")";
-    context.setFillStyle(colorString);
+      float alpha = (float) color.getAlpha() / 255f;
+      String colorString = convert(color, alpha);
+      context.setFillStyle(colorString);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#setStroke(java.awt.BasicStroke)
-   */
   @Override
   public void setStroke(BasicStroke stroke) {
-    if(stroke != null){
-    // TODO support for stroke pattern as soon ie is support stroke patterns
-    if (stroke.getDashArray() != null) {
-      System.err.println("stroke patterns aren't suppoted");
-      //throw new IllegalArgumentException("Stroke patterns aren't supported");
-    }
+    if (stroke != null) {
+      // TODO support for stroke pattern as soon ie is support stroke patterns
+      if (stroke.getDashArray() != null) {
+        System.err.println("Ignoring stroke pattern. They aren't suppoted yet");
+        // throw new IllegalArgumentException("Stroke patterns aren't supported");
+      }
 
-    context.setMiterLimit(stroke.getMiterLimit());
-    context.setLineWidth(stroke.getLineWidth());
+      context.setMiterLimit(stroke.getMiterLimit());
+      context.setLineWidth(stroke.getLineWidth());
 
-    switch (stroke.getLineJoin()){
-      case BasicStroke.JOIN_BEVEL :
-        context.setLineJoin(LineJoin.BEVEL);
-        break;
-      case BasicStroke.JOIN_MITER :
-        context.setLineJoin(LineJoin.MITER);
-        break;
-      case BasicStroke.JOIN_ROUND :
-        context.setLineJoin(LineJoin.ROUND);
-        break;
-      default :
-        System.err.println("unknown line join type");
-        throw new IllegalArgumentException("illegal line join value");
-    }
+      switch (stroke.getLineJoin()){
+        case BasicStroke.JOIN_BEVEL :
+          context.setLineJoin(LineJoin.BEVEL);
+          break;
+        case BasicStroke.JOIN_MITER :
+          context.setLineJoin(LineJoin.MITER);
+          break;
+        case BasicStroke.JOIN_ROUND :
+          context.setLineJoin(LineJoin.ROUND);
+          break;
+        default :
+          System.err.println("unknown line join type");
+          throw new IllegalArgumentException("illegal line join value");
+      }
 
-    switch (stroke.getEndCap()){
-      case BasicStroke.CAP_BUTT :
-        context.setLineCap(LineCap.BUTT);
-        break;
-      case BasicStroke.CAP_ROUND :
-        context.setLineCap(LineCap.ROUND);
-        break;
-      case BasicStroke.CAP_SQUARE :
-        context.setLineCap(LineCap.SQUARE);
-        break;
-      default :
-        System.err.println("unknown line cap type");
-        throw new IllegalArgumentException("illegal line cap value");
-    }
+      switch (stroke.getEndCap()){
+        case BasicStroke.CAP_BUTT :
+          context.setLineCap(LineCap.BUTT);
+          break;
+        case BasicStroke.CAP_ROUND :
+          context.setLineCap(LineCap.ROUND);
+          break;
+        case BasicStroke.CAP_SQUARE :
+          context.setLineCap(LineCap.SQUARE);
+          break;
+        default :
+          System.err.println("unknown line cap type");
+          throw new IllegalArgumentException("illegal line cap value");
+      }
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#draw(java.awt.Shape)
-   */
   @Override
   public void draw(Shape shape) {
     if (shape != null) {
       path(shape);
       context.stroke();
-    }else{System.err.println("dreckdreckdreck");}
+    } else {
+      System.err.println("dreckdreckdreck");
+    }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#fill(java.awt.Shape)
-   */
   @Override
   public void fill(Shape shape) {
     if (shape != null) {
@@ -217,33 +178,18 @@ public class WebGraphics implements Graphics {
   }
 
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#setFont(java.awt.Font)
-   */
   @Override
   public void setFont(Font font) {
-     if (font != null && font.getFontName() != null)
-     context.setFont(font.getFontName());
+    if (font != null && font.getFontName() != null)
+      context.setFont(font.getFontName());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#clipRect(int, int, int, int)
-   */
   @Override
   public void clipRect(int x, int y, int width, int height) {
     // TODO validate, intersec, null
     this.setClip(x, y, width, height);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#setClip(int, int, int, int)
-   */
   @Override
   public void setClip(int x, int y, int width, int height) {
     context.beginPath();
@@ -257,45 +203,22 @@ public class WebGraphics implements Graphics {
 
   }
 
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#setClip(java.awt.Shape)
-   */
   @Override
   public void setClip(Shape clip) {
     path(clip);
     context.clip();
   }
 
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#clearRect(int, int, int, int)
-   */
   @Override
   public void clearRect(int x, int y, int width, int height) {
     context.clearRect(x, y, width, height);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#drawString(java.lang.String, int, int)
-   */
   @Override
   public void drawString(String str, int x, int y) {
     context.strokeText(str, x, y);
   }
 
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.levigo.util.gwtawt.client.WebGraphics#drawChars(char[], int, int, int, int)
-   */
   @Override
   public void drawChars(char data[], int offset, int length, int x, int y) {
     drawString(new String(data, offset, length), x, y);
@@ -303,13 +226,10 @@ public class WebGraphics implements Graphics {
 
   @Override
   public void drawLine(double x, double y, double x2, double y2) {
-//    Rectangle rect = new Rectangle();
-//    rect.setRect(x,y,x2-x,y2-y);
-//    path(rect);
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x2, y2);
     context.stroke();
-    
+
   }
 }
