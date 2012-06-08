@@ -13,19 +13,31 @@
 		</dependency>
 	</dependencies>
 
-  <distributionManagement>
-    <repository>
-      <id>maven2.releases.levigo.de</id>
-      <url>https://levigo.de/maven2/content/repositories/levigo-releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven2.snapshots.levigo.de</id>
-      <url>https://levigo.de/maven2/content/repositories/levigo-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
-  
+	<distributionManagement>
+		<repository>
+			<id>maven2.releases.levigo.de</id>
+			<url>https://levigo.de/maven2/content/repositories/levigo-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>maven2.snapshots.levigo.de</id>
+			<url>https://levigo.de/maven2/content/repositories/levigo-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<build>
 		<plugins>
+			<!-- Fix Bug, that emul files are added to jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>java/**/*</exclude>
+						<exclude>sun/**/*</exclude>
+						<exclude>Emul.gwt.xml</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
