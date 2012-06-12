@@ -25,6 +25,7 @@ package java.awt.geom;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.io.Serializable;
+import sun.awt.geom.Curve;
 
 import com.levigo.util.gwtawt.client.helper.Arrays;
 
@@ -54,7 +55,7 @@ import com.levigo.util.gwtawt.client.helper.Arrays;
  * @author Jim Graham
  * @since 1.6
  */
-public abstract class Path2D implements Shape/*, Cloneable*/ {
+public abstract class Path2D implements Shape/* , Cloneable */{
   /**
    * An even-odd winding rule for determining the interior of a path.
    * 
@@ -434,191 +435,107 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
     }
 
     int pointCrossings(double px, double py) {
-      // TODO
-      assert (false) : "Not implemented yet";
-      return -1;
+      double movx, movy, curx, cury, endx, endy;
+      float coords[] = floatCoords;
+      curx = movx = coords[0];
+      cury = movy = coords[1];
+      int crossings = 0;
+      int ci = 2;
+      for (int i = 1; i < numTypes; i++) {
+        switch (pointTypes[i]){
+          case PathIterator.SEG_MOVETO :
+            if (cury != movy) {
+              crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+            }
+            movx = curx = coords[ci++];
+            movy = cury = coords[ci++];
+            break;
+          case PathIterator.SEG_LINETO :
+            crossings += Curve.pointCrossingsForLine(px, py, curx, cury, endx = coords[ci++], endy = coords[ci++]);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_QUADTO :
+            crossings += Curve.pointCrossingsForQuad(px, py, curx, cury, coords[ci++], coords[ci++],
+                endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CUBICTO :
+            crossings += Curve.pointCrossingsForCubic(px, py, curx, cury, coords[ci++], coords[ci++], coords[ci++],
+                coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CLOSE :
+            if (cury != movy) {
+              crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+            }
+            curx = movx;
+            cury = movy;
+            break;
+        }
+      }
+      if (cury != movy) {
+        crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+      }
+      return crossings;
     }
 
-    @Override
     int rectCrossings(double rxmin, double rymin, double rxmax, double rymax) {
-      // TODO
-      assert (false) : "Not implemented yet";
-      return -1;
+      float coords[] = floatCoords;
+      double curx, cury, movx, movy, endx, endy;
+      curx = movx = coords[0];
+      cury = movy = coords[1];
+      int crossings = 0;
+      int ci = 2;
+      for (int i = 1; crossings != Curve.RECT_INTERSECTS && i < numTypes; i++) {
+        switch (pointTypes[i]){
+          case PathIterator.SEG_MOVETO :
+            if (curx != movx || cury != movy) {
+              crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+            }
+            // Count should always be a multiple of 2 here.
+            // assert((crossings & 1) != 0);
+            movx = curx = coords[ci++];
+            movy = cury = coords[ci++];
+            break;
+          case PathIterator.SEG_LINETO :
+            crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury,
+                endx = coords[ci++], endy = coords[ci++]);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_QUADTO :
+            crossings = Curve.rectCrossingsForQuad(crossings, rxmin, rymin, rxmax, rymax, curx, cury, coords[ci++],
+                coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CUBICTO :
+            crossings = Curve.rectCrossingsForCubic(crossings, rxmin, rymin, rxmax, rymax, curx, cury, coords[ci++],
+                coords[ci++], coords[ci++], coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CLOSE :
+            if (curx != movx || cury != movy) {
+              crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+            }
+            curx = movx;
+            cury = movy;
+            // Count should always be a multiple of 2 here.
+            // assert((crossings & 1) != 0);
+            break;
+        }
+      }
+      if (crossings != Curve.RECT_INTERSECTS && (curx != movx || cury != movy)) {
+        crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+      }
+      // Count should always be a multiple of 2 here.
+      // assert((crossings & 1) != 0);
+      return crossings;
     }
-
-    // double movx, movy, curx, cury, endx, endy;
-    // float coords[] = floatCoords;
-    // curx = movx = coords[0];
-    // cury = movy = coords[1];
-    // int crossings = 0;
-    // int ci = 2;
-    // for (int i = 1; i < numTypes; i++) {
-    // switch (pointTypes[i]) {
-    // case PathIterator.SEG_MOVETO:
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // movx = curx = coords[ci++];
-    // movy = cury = coords[ci++];
-    // break;
-    // case PathIterator.SEG_LINETO:
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // endx = coords[ci++],
-    // endy = coords[ci++]);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_QUADTO:
-    // crossings +=
-    // Curve.pointCrossingsForQuad(px, py,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CUBICTO:
-    // crossings +=
-    // Curve.pointCrossingsForCubic(px, py,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CLOSE:
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // curx = movx;
-    // cury = movy;
-    // break;
-    // }
-    // }
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // return crossings;
-    // }
-    //
-    // int rectCrossings(double rxmin, double rymin,
-    // double rxmax, double rymax)
-    // {
-    // float coords[] = floatCoords;
-    // double curx, cury, movx, movy, endx, endy;
-    // curx = movx = coords[0];
-    // cury = movy = coords[1];
-    // int crossings = 0;
-    // int ci = 2;
-    // for (int i = 1;
-    // crossings != Curve.RECT_INTERSECTS && i < numTypes;
-    // i++)
-    // {
-    // switch (pointTypes[i]) {
-    // case PathIterator.SEG_MOVETO:
-    // if (curx != movx || cury != movy) {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // movx = curx = coords[ci++];
-    // movy = cury = coords[ci++];
-    // break;
-    // case PathIterator.SEG_LINETO:
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // endx = coords[ci++],
-    // endy = coords[ci++]);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_QUADTO:
-    // crossings =
-    // Curve.rectCrossingsForQuad(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CUBICTO:
-    // crossings =
-    // Curve.rectCrossingsForCubic(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CLOSE:
-    // if (curx != movx || cury != movy) {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // curx = movx;
-    // cury = movy;
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // break;
-    // }
-    // }
-    // if (crossings != Curve.RECT_INTERSECTS &&
-    // (curx != movx || cury != movy))
-    // {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // return crossings;
-    // }
 
     /**
      * {@inheritDoc}
@@ -721,150 +638,151 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
      * @see java.lang.Cloneable
      * @since 1.6
      */
-//    public final Object clone() {
-//      // Note: It would be nice to have this return Path2D
-//      // but one of our subclasses (GeneralPath) needs to
-//      // offer "public Object clone()" for backwards
-//      // compatibility so we cannot restrict it further.
-//      // REMIND: Can we do both somehow?
-//      if (this instanceof GeneralPath) {
-//        return new GeneralPath(this);
-//      } else {
-//        return new Path2D.Float(this);
-//      }
-//    }
+    // public final Object clone() {
+    // // Note: It would be nice to have this return Path2D
+    // // but one of our subclasses (GeneralPath) needs to
+    // // offer "public Object clone()" for backwards
+    // // compatibility so we cannot restrict it further.
+    // // REMIND: Can we do both somehow?
+    // if (this instanceof GeneralPath) {
+    // return new GeneralPath(this);
+    // } else {
+    // return new Path2D.Float(this);
+    // }
+    // }
 
     /*
      * JDK 1.6 serialVersionUID
      */
     private static final long serialVersionUID = 6990832515060788886L;
 
-//    /**
-//     * Writes the default serializable fields to the {@code ObjectOutputStream} followed by an
-//     * explicit serialization of the path segments stored in this path.
-//     * 
-//     * @serialData <a name="Path2DSerialData"><!-- --></a>
-//     *             <ol>
-//     *             <li>The default serializable fields. There are no default serializable fields as
-//     *             of 1.6.
-//     *             <li>followed by a byte indicating the storage type of the original object as a
-//     *             hint (SERIAL_STORAGE_FLT_ARRAY)
-//     *             <li>followed by an integer indicating the number of path segments to follow (NP)
-//     *             or -1 to indicate an unknown number of path segments follows
-//     *             <li>followed by an integer indicating the total number of coordinates to follow
-//     *             (NC) or -1 to indicate an unknown number of coordinates follows (NC should always
-//     *             be even since coordinates always appear in pairs representing an x,y pair)
-//     *             <li>followed by a byte indicating the winding rule ({@link #WIND_EVEN_ODD
-//     *             WIND_EVEN_ODD} or {@link #WIND_NON_ZERO WIND_NON_ZERO})
-//     *             <li>followed by NP (or unlimited if NP < 0) sets of values consisting of a single
-//     *             byte indicating a path segment type followed by one or more pairs of float or
-//     *             double values representing the coordinates of the path segment
-//     *             <li>followed by a byte indicating the end of the path (SERIAL_PATH_END).
-//     *             </ol>
-//     *             <p>
-//     *             The following byte value constants are used in the serialized form of
-//     *             {@code Path2D} objects:
-//     *             <table>
-//     *             <tr>
-//     *             <th>Constant Name</th>
-//     *             <th>Byte Value</th>
-//     *             <th>Followed by</th>
-//     *             <th>Description</th>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_STORAGE_FLT_ARRAY}</td>
-//     *             <td>0x30</td>
-//     *             <td></td>
-//     *             <td>A hint that the original {@code Path2D} object stored the coordinates in a
-//     *             Java array of floats.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_STORAGE_DBL_ARRAY}</td>
-//     *             <td>0x31</td>
-//     *             <td></td>
-//     *             <td>A hint that the original {@code Path2D} object stored the coordinates in a
-//     *             Java array of doubles.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_MOVETO}</td>
-//     *             <td>0x40</td>
-//     *             <td>2 floats</td>
-//     *             <td>A {@link #moveTo moveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_LINETO}</td>
-//     *             <td>0x41</td>
-//     *             <td>2 floats</td>
-//     *             <td>A {@link #lineTo lineTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_QUADTO}</td>
-//     *             <td>0x42</td>
-//     *             <td>4 floats</td>
-//     *             <td>A {@link #quadTo quadTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_CUBICTO}</td>
-//     *             <td>0x43</td>
-//     *             <td>6 floats</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_MOVETO}</td>
-//     *             <td>0x50</td>
-//     *             <td>2 doubles</td>
-//     *             <td>A {@link #moveTo moveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_LINETO}</td>
-//     *             <td>0x51</td>
-//     *             <td>2 doubles</td>
-//     *             <td>A {@link #lineTo lineTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_QUADTO}</td>
-//     *             <td>0x52</td>
-//     *             <td>4 doubles</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_CUBICTO}</td>
-//     *             <td>0x53</td>
-//     *             <td>6 doubles</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_CLOSE}</td>
-//     *             <td>0x60</td>
-//     *             <td></td>
-//     *             <td>A {@link #closePath closePath} path segment.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_PATH_END}</td>
-//     *             <td>0x61</td>
-//     *             <td></td>
-//     *             <td>There are no more path segments following.</td>
-//     *             </table>
-//     * 
-//     * @since 1.6
-//     */
-//    private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
-//      super.writeObject(s, false);
-//    }
-//
-//    /**
-//     * Reads the default serializable fields from the {@code ObjectInputStream} followed by an
-//     * explicit serialization of the path segments stored in this path.
-//     * <p>
-//     * There are no default serializable fields as of 1.6.
-//     * <p>
-//     * The serial data for this object is described in the writeObject method.
-//     * 
-//     * @since 1.6
-//     */
-//    private void readObject(java.io.ObjectInputStream s) throws java.lang.ClassNotFoundException, java.io.IOException {
-//      super.readObject(s, false);
-//    }
+    // /**
+    // * Writes the default serializable fields to the {@code ObjectOutputStream} followed by an
+    // * explicit serialization of the path segments stored in this path.
+    // *
+    // * @serialData <a name="Path2DSerialData"><!-- --></a>
+    // * <ol>
+    // * <li>The default serializable fields. There are no default serializable fields as
+    // * of 1.6.
+    // * <li>followed by a byte indicating the storage type of the original object as a
+    // * hint (SERIAL_STORAGE_FLT_ARRAY)
+    // * <li>followed by an integer indicating the number of path segments to follow (NP)
+    // * or -1 to indicate an unknown number of path segments follows
+    // * <li>followed by an integer indicating the total number of coordinates to follow
+    // * (NC) or -1 to indicate an unknown number of coordinates follows (NC should always
+    // * be even since coordinates always appear in pairs representing an x,y pair)
+    // * <li>followed by a byte indicating the winding rule ({@link #WIND_EVEN_ODD
+    // * WIND_EVEN_ODD} or {@link #WIND_NON_ZERO WIND_NON_ZERO})
+    // * <li>followed by NP (or unlimited if NP < 0) sets of values consisting of a single
+    // * byte indicating a path segment type followed by one or more pairs of float or
+    // * double values representing the coordinates of the path segment
+    // * <li>followed by a byte indicating the end of the path (SERIAL_PATH_END).
+    // * </ol>
+    // * <p>
+    // * The following byte value constants are used in the serialized form of
+    // * {@code Path2D} objects:
+    // * <table>
+    // * <tr>
+    // * <th>Constant Name</th>
+    // * <th>Byte Value</th>
+    // * <th>Followed by</th>
+    // * <th>Description</th>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_STORAGE_FLT_ARRAY}</td>
+    // * <td>0x30</td>
+    // * <td></td>
+    // * <td>A hint that the original {@code Path2D} object stored the coordinates in a
+    // * Java array of floats.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_STORAGE_DBL_ARRAY}</td>
+    // * <td>0x31</td>
+    // * <td></td>
+    // * <td>A hint that the original {@code Path2D} object stored the coordinates in a
+    // * Java array of doubles.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_MOVETO}</td>
+    // * <td>0x40</td>
+    // * <td>2 floats</td>
+    // * <td>A {@link #moveTo moveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_LINETO}</td>
+    // * <td>0x41</td>
+    // * <td>2 floats</td>
+    // * <td>A {@link #lineTo lineTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_QUADTO}</td>
+    // * <td>0x42</td>
+    // * <td>4 floats</td>
+    // * <td>A {@link #quadTo quadTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_CUBICTO}</td>
+    // * <td>0x43</td>
+    // * <td>6 floats</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_MOVETO}</td>
+    // * <td>0x50</td>
+    // * <td>2 doubles</td>
+    // * <td>A {@link #moveTo moveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_LINETO}</td>
+    // * <td>0x51</td>
+    // * <td>2 doubles</td>
+    // * <td>A {@link #lineTo lineTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_QUADTO}</td>
+    // * <td>0x52</td>
+    // * <td>4 doubles</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_CUBICTO}</td>
+    // * <td>0x53</td>
+    // * <td>6 doubles</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_CLOSE}</td>
+    // * <td>0x60</td>
+    // * <td></td>
+    // * <td>A {@link #closePath closePath} path segment.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_PATH_END}</td>
+    // * <td>0x61</td>
+    // * <td></td>
+    // * <td>There are no more path segments following.</td>
+    // * </table>
+    // *
+    // * @since 1.6
+    // */
+    // private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
+    // super.writeObject(s, false);
+    // }
+    //
+    // /**
+    // * Reads the default serializable fields from the {@code ObjectInputStream} followed by an
+    // * explicit serialization of the path segments stored in this path.
+    // * <p>
+    // * There are no default serializable fields as of 1.6.
+    // * <p>
+    // * The serial data for this object is described in the writeObject method.
+    // *
+    // * @since 1.6
+    // */
+    // private void readObject(java.io.ObjectInputStream s) throws java.lang.ClassNotFoundException,
+    // java.io.IOException {
+    // super.readObject(s, false);
+    // }
 
     static class CopyIterator extends Path2D.Iterator {
       float floatCoords[];
@@ -1134,193 +1052,109 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
       doubleCoords[numCoords++] = y3;
     }
 
-    @Override
-    int rectCrossings(double rxmin, double rymin, double rxmax, double rymax) {
-      // TODO
-      assert (false) : "Not implemented yet";
-      return -1;
-    }
-
     int pointCrossings(double px, double py) {
-      // TODO
-      assert (false) : "Not implemented yet";
-      return -1;
+      double movx, movy, curx, cury, endx, endy;
+      double coords[] = doubleCoords;
+      curx = movx = coords[0];
+      cury = movy = coords[1];
+      int crossings = 0;
+      int ci = 2;
+      for (int i = 1; i < numTypes; i++) {
+        switch (pointTypes[i]){
+          case PathIterator.SEG_MOVETO :
+            if (cury != movy) {
+              crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+            }
+            movx = curx = coords[ci++];
+            movy = cury = coords[ci++];
+            break;
+          case PathIterator.SEG_LINETO :
+            crossings += Curve.pointCrossingsForLine(px, py, curx, cury, endx = coords[ci++], endy = coords[ci++]);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_QUADTO :
+            crossings += Curve.pointCrossingsForQuad(px, py, curx, cury, coords[ci++], coords[ci++],
+                endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CUBICTO :
+            crossings += Curve.pointCrossingsForCubic(px, py, curx, cury, coords[ci++], coords[ci++], coords[ci++],
+                coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CLOSE :
+            if (cury != movy) {
+              crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+            }
+            curx = movx;
+            cury = movy;
+            break;
+        }
+      }
+      if (cury != movy) {
+        crossings += Curve.pointCrossingsForLine(px, py, curx, cury, movx, movy);
+      }
+      return crossings;
     }
 
-    // double movx, movy, curx, cury, endx, endy;
-    // double coords[] = doubleCoords;
-    // curx = movx = coords[0];
-    // cury = movy = coords[1];
-    // int crossings = 0;
-    // int ci = 2;
-    // for (int i = 1; i < numTypes; i++) {
-    // switch (pointTypes[i]) {
-    // case PathIterator.SEG_MOVETO:
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // movx = curx = coords[ci++];
-    // movy = cury = coords[ci++];
-    // break;
-    // case PathIterator.SEG_LINETO:
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // endx = coords[ci++],
-    // endy = coords[ci++]);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_QUADTO:
-    // crossings +=
-    // Curve.pointCrossingsForQuad(px, py,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CUBICTO:
-    // crossings +=
-    // Curve.pointCrossingsForCubic(px, py,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CLOSE:
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // curx = movx;
-    // cury = movy;
-    // break;
-    // }
-    // }
-    // if (cury != movy) {
-    // crossings +=
-    // Curve.pointCrossingsForLine(px, py,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // return crossings;
-    // }
-    //
-    // int rectCrossings(double rxmin, double rymin,
-    // double rxmax, double rymax)
-    // {
-    // double coords[] = doubleCoords;
-    // double curx, cury, movx, movy, endx, endy;
-    // curx = movx = coords[0];
-    // cury = movy = coords[1];
-    // int crossings = 0;
-    // int ci = 2;
-    // for (int i = 1;
-    // crossings != Curve.RECT_INTERSECTS && i < numTypes;
-    // i++)
-    // {
-    // switch (pointTypes[i]) {
-    // case PathIterator.SEG_MOVETO:
-    // if (curx != movx || cury != movy) {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // movx = curx = coords[ci++];
-    // movy = cury = coords[ci++];
-    // break;
-    // case PathIterator.SEG_LINETO:
-    // endx = coords[ci++];
-    // endy = coords[ci++];
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // endx, endy);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_QUADTO:
-    // crossings =
-    // Curve.rectCrossingsForQuad(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CUBICTO:
-    // crossings =
-    // Curve.rectCrossingsForCubic(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // coords[ci++],
-    // endx = coords[ci++],
-    // endy = coords[ci++],
-    // 0);
-    // curx = endx;
-    // cury = endy;
-    // break;
-    // case PathIterator.SEG_CLOSE:
-    // if (curx != movx || cury != movy) {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // curx = movx;
-    // cury = movy;
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // break;
-    // }
-    // }
-    // if (crossings != Curve.RECT_INTERSECTS &&
-    // (curx != movx || cury != movy))
-    // {
-    // crossings =
-    // Curve.rectCrossingsForLine(crossings,
-    // rxmin, rymin,
-    // rxmax, rymax,
-    // curx, cury,
-    // movx, movy);
-    // }
-    // // Count should always be a multiple of 2 here.
-    // // assert((crossings & 1) != 0);
-    // return crossings;
-    // }
+    int rectCrossings(double rxmin, double rymin, double rxmax, double rymax) {
+      double coords[] = doubleCoords;
+      double curx, cury, movx, movy, endx, endy;
+      curx = movx = coords[0];
+      cury = movy = coords[1];
+      int crossings = 0;
+      int ci = 2;
+      for (int i = 1; crossings != Curve.RECT_INTERSECTS && i < numTypes; i++) {
+        switch (pointTypes[i]){
+          case PathIterator.SEG_MOVETO :
+            if (curx != movx || cury != movy) {
+              crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+            }
+            // Count should always be a multiple of 2 here.
+            // assert((crossings & 1) != 0);
+            movx = curx = coords[ci++];
+            movy = cury = coords[ci++];
+            break;
+          case PathIterator.SEG_LINETO :
+            endx = coords[ci++];
+            endy = coords[ci++];
+            crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, endx, endy);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_QUADTO :
+            crossings = Curve.rectCrossingsForQuad(crossings, rxmin, rymin, rxmax, rymax, curx, cury, coords[ci++],
+                coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CUBICTO :
+            crossings = Curve.rectCrossingsForCubic(crossings, rxmin, rymin, rxmax, rymax, curx, cury, coords[ci++],
+                coords[ci++], coords[ci++], coords[ci++], endx = coords[ci++], endy = coords[ci++], 0);
+            curx = endx;
+            cury = endy;
+            break;
+          case PathIterator.SEG_CLOSE :
+            if (curx != movx || cury != movy) {
+              crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+            }
+            curx = movx;
+            cury = movy;
+            // Count should always be a multiple of 2 here.
+            // assert((crossings & 1) != 0);
+            break;
+        }
+      }
+      if (crossings != Curve.RECT_INTERSECTS && (curx != movx || cury != movy)) {
+        crossings = Curve.rectCrossingsForLine(crossings, rxmin, rymin, rxmax, rymax, curx, cury, movx, movy);
+      }
+      // Count should always be a multiple of 2 here.
+      // assert((crossings & 1) != 0);
+      return crossings;
+    }
 
     /**
      * {@inheritDoc}
@@ -1426,146 +1260,147 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
      * @see java.lang.Cloneable
      * @since 1.6
      */
-//    public final Object clone() {
-//      // Note: It would be nice to have this return Path2D
-//      // but one of our subclasses (GeneralPath) needs to
-//      // offer "public Object clone()" for backwards
-//      // compatibility so we cannot restrict it further.
-//      // REMIND: Can we do both somehow?
-//      return new Path2D.Double(this);
-//    }
+    // public final Object clone() {
+    // // Note: It would be nice to have this return Path2D
+    // // but one of our subclasses (GeneralPath) needs to
+    // // offer "public Object clone()" for backwards
+    // // compatibility so we cannot restrict it further.
+    // // REMIND: Can we do both somehow?
+    // return new Path2D.Double(this);
+    // }
 
     /*
      * JDK 1.6 serialVersionUID
      */
     private static final long serialVersionUID = 1826762518450014216L;
 
-//    /**
-//     * Writes the default serializable fields to the {@code ObjectOutputStream} followed by an
-//     * explicit serialization of the path segments stored in this path.
-//     * 
-//     * @serialData <a name="Path2DSerialData"><!-- --></a>
-//     *             <ol>
-//     *             <li>The default serializable fields. There are no default serializable fields as
-//     *             of 1.6.
-//     *             <li>followed by a byte indicating the storage type of the original object as a
-//     *             hint (SERIAL_STORAGE_DBL_ARRAY)
-//     *             <li>followed by an integer indicating the number of path segments to follow (NP)
-//     *             or -1 to indicate an unknown number of path segments follows
-//     *             <li>followed by an integer indicating the total number of coordinates to follow
-//     *             (NC) or -1 to indicate an unknown number of coordinates follows (NC should always
-//     *             be even since coordinates always appear in pairs representing an x,y pair)
-//     *             <li>followed by a byte indicating the winding rule ({@link #WIND_EVEN_ODD
-//     *             WIND_EVEN_ODD} or {@link #WIND_NON_ZERO WIND_NON_ZERO})
-//     *             <li>followed by NP (or unlimited if NP < 0) sets of values consisting of a single
-//     *             byte indicating a path segment type followed by one or more pairs of float or
-//     *             double values representing the coordinates of the path segment
-//     *             <li>followed by a byte indicating the end of the path (SERIAL_PATH_END).
-//     *             </ol>
-//     *             <p>
-//     *             The following byte value constants are used in the serialized form of
-//     *             {@code Path2D} objects:
-//     *             <table>
-//     *             <tr>
-//     *             <th>Constant Name</th>
-//     *             <th>Byte Value</th>
-//     *             <th>Followed by</th>
-//     *             <th>Description</th>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_STORAGE_FLT_ARRAY}</td>
-//     *             <td>0x30</td>
-//     *             <td></td>
-//     *             <td>A hint that the original {@code Path2D} object stored the coordinates in a
-//     *             Java array of floats.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_STORAGE_DBL_ARRAY}</td>
-//     *             <td>0x31</td>
-//     *             <td></td>
-//     *             <td>A hint that the original {@code Path2D} object stored the coordinates in a
-//     *             Java array of doubles.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_MOVETO}</td>
-//     *             <td>0x40</td>
-//     *             <td>2 floats</td>
-//     *             <td>A {@link #moveTo moveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_LINETO}</td>
-//     *             <td>0x41</td>
-//     *             <td>2 floats</td>
-//     *             <td>A {@link #lineTo lineTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_QUADTO}</td>
-//     *             <td>0x42</td>
-//     *             <td>4 floats</td>
-//     *             <td>A {@link #quadTo quadTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_FLT_CUBICTO}</td>
-//     *             <td>0x43</td>
-//     *             <td>6 floats</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_MOVETO}</td>
-//     *             <td>0x50</td>
-//     *             <td>2 doubles</td>
-//     *             <td>A {@link #moveTo moveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_LINETO}</td>
-//     *             <td>0x51</td>
-//     *             <td>2 doubles</td>
-//     *             <td>A {@link #lineTo lineTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_QUADTO}</td>
-//     *             <td>0x52</td>
-//     *             <td>4 doubles</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_DBL_CUBICTO}</td>
-//     *             <td>0x53</td>
-//     *             <td>6 doubles</td>
-//     *             <td>A {@link #curveTo curveTo} path segment follows.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_SEG_CLOSE}</td>
-//     *             <td>0x60</td>
-//     *             <td></td>
-//     *             <td>A {@link #closePath closePath} path segment.</td>
-//     *             </tr>
-//     *             <tr>
-//     *             <td>{@code SERIAL_PATH_END}</td>
-//     *             <td>0x61</td>
-//     *             <td></td>
-//     *             <td>There are no more path segments following.</td>
-//     *             </table>
-//     * 
-//     * @since 1.6
-//     */
-//    private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
-//      super.writeObject(s, true);
-//    }
-//
-//    /**
-//     * Reads the default serializable fields from the {@code ObjectInputStream} followed by an
-//     * explicit serialization of the path segments stored in this path.
-//     * <p>
-//     * There are no default serializable fields as of 1.6.
-//     * <p>
-//     * The serial data for this object is described in the writeObject method.
-//     * 
-//     * @since 1.6
-//     */
-//    private void readObject(java.io.ObjectInputStream s) throws java.lang.ClassNotFoundException, java.io.IOException {
-//      super.readObject(s, true);
-//    }
+    // /**
+    // * Writes the default serializable fields to the {@code ObjectOutputStream} followed by an
+    // * explicit serialization of the path segments stored in this path.
+    // *
+    // * @serialData <a name="Path2DSerialData"><!-- --></a>
+    // * <ol>
+    // * <li>The default serializable fields. There are no default serializable fields as
+    // * of 1.6.
+    // * <li>followed by a byte indicating the storage type of the original object as a
+    // * hint (SERIAL_STORAGE_DBL_ARRAY)
+    // * <li>followed by an integer indicating the number of path segments to follow (NP)
+    // * or -1 to indicate an unknown number of path segments follows
+    // * <li>followed by an integer indicating the total number of coordinates to follow
+    // * (NC) or -1 to indicate an unknown number of coordinates follows (NC should always
+    // * be even since coordinates always appear in pairs representing an x,y pair)
+    // * <li>followed by a byte indicating the winding rule ({@link #WIND_EVEN_ODD
+    // * WIND_EVEN_ODD} or {@link #WIND_NON_ZERO WIND_NON_ZERO})
+    // * <li>followed by NP (or unlimited if NP < 0) sets of values consisting of a single
+    // * byte indicating a path segment type followed by one or more pairs of float or
+    // * double values representing the coordinates of the path segment
+    // * <li>followed by a byte indicating the end of the path (SERIAL_PATH_END).
+    // * </ol>
+    // * <p>
+    // * The following byte value constants are used in the serialized form of
+    // * {@code Path2D} objects:
+    // * <table>
+    // * <tr>
+    // * <th>Constant Name</th>
+    // * <th>Byte Value</th>
+    // * <th>Followed by</th>
+    // * <th>Description</th>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_STORAGE_FLT_ARRAY}</td>
+    // * <td>0x30</td>
+    // * <td></td>
+    // * <td>A hint that the original {@code Path2D} object stored the coordinates in a
+    // * Java array of floats.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_STORAGE_DBL_ARRAY}</td>
+    // * <td>0x31</td>
+    // * <td></td>
+    // * <td>A hint that the original {@code Path2D} object stored the coordinates in a
+    // * Java array of doubles.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_MOVETO}</td>
+    // * <td>0x40</td>
+    // * <td>2 floats</td>
+    // * <td>A {@link #moveTo moveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_LINETO}</td>
+    // * <td>0x41</td>
+    // * <td>2 floats</td>
+    // * <td>A {@link #lineTo lineTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_QUADTO}</td>
+    // * <td>0x42</td>
+    // * <td>4 floats</td>
+    // * <td>A {@link #quadTo quadTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_FLT_CUBICTO}</td>
+    // * <td>0x43</td>
+    // * <td>6 floats</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_MOVETO}</td>
+    // * <td>0x50</td>
+    // * <td>2 doubles</td>
+    // * <td>A {@link #moveTo moveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_LINETO}</td>
+    // * <td>0x51</td>
+    // * <td>2 doubles</td>
+    // * <td>A {@link #lineTo lineTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_QUADTO}</td>
+    // * <td>0x52</td>
+    // * <td>4 doubles</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_DBL_CUBICTO}</td>
+    // * <td>0x53</td>
+    // * <td>6 doubles</td>
+    // * <td>A {@link #curveTo curveTo} path segment follows.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_SEG_CLOSE}</td>
+    // * <td>0x60</td>
+    // * <td></td>
+    // * <td>A {@link #closePath closePath} path segment.</td>
+    // * </tr>
+    // * <tr>
+    // * <td>{@code SERIAL_PATH_END}</td>
+    // * <td>0x61</td>
+    // * <td></td>
+    // * <td>There are no more path segments following.</td>
+    // * </table>
+    // *
+    // * @since 1.6
+    // */
+    // private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
+    // super.writeObject(s, true);
+    // }
+    //
+    // /**
+    // * Reads the default serializable fields from the {@code ObjectInputStream} followed by an
+    // * explicit serialization of the path segments stored in this path.
+    // * <p>
+    // * There are no default serializable fields as of 1.6.
+    // * <p>
+    // * The serial data for this object is described in the writeObject method.
+    // *
+    // * @since 1.6
+    // */
+    // private void readObject(java.io.ObjectInputStream s) throws java.lang.ClassNotFoundException,
+    // java.io.IOException {
+    // super.readObject(s, true);
+    // }
 
     static class CopyIterator extends Path2D.Iterator {
       double doubleCoords[];
@@ -1821,14 +1656,14 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
    * @return a new {@code Shape}, transformed with the specified {@code AffineTransform}.
    * @since 1.6
    */
-//  public final synchronized Shape createTransformedShape(AffineTransform at) {
-//    Path2D p2d = (Path2D) clone();
-//    
-//    if (at != null) {
-//      p2d.transform(at);
-//    }
-//    return p2d;
-//  }
+  // public final synchronized Shape createTransformedShape(AffineTransform at) {
+  // Path2D p2d = (Path2D) clone();
+  //
+  // if (at != null) {
+  // p2d.transform(at);
+  // }
+  // return p2d;
+  // }
 
   /**
    * {@inheritDoc}
@@ -2154,7 +1989,7 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
     // TODO
     assert (false) : "Not implemented yet";
     return false;
-    
+
     // int mask = (windingRule == WIND_NON_ZERO ? -1 : 2);
     // int crossings = rectCrossings(x, y, x + w, y + h);
     // return (crossings == Curve.RECT_INTERSECTS || (crossings & mask) != 0);
@@ -2186,9 +2021,9 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
    * 
    * @since 1.6
    */
-//  public final PathIterator getPathIterator(AffineTransform at, double flatness) {
-//    return new FlatteningPathIterator(getPathIterator(at), flatness);
-//  }
+  // public final PathIterator getPathIterator(AffineTransform at, double flatness) {
+  // return new FlatteningPathIterator(getPathIterator(at), flatness);
+  // }
 
   /**
    * Creates a new object of the same class as this object.
@@ -2198,7 +2033,7 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
    * @see java.lang.Cloneable
    * @since 1.6
    */
-//  public abstract Object clone();
+  // public abstract Object clone();
 
   // Note: It would be nice to have this return Path2D
   // but one of our subclasses (GeneralPath) needs to
@@ -2206,196 +2041,198 @@ public abstract class Path2D implements Shape/*, Cloneable*/ {
   // compatibility so we cannot restrict it further.
   // REMIND: Can we do both somehow?
 
-//  /*
-//   * Support fields and methods for serializing the subclasses.
-//   */
-//  private static final byte SERIAL_STORAGE_FLT_ARRAY = 0x30;
-//  private static final byte SERIAL_STORAGE_DBL_ARRAY = 0x31;
-//
-//  private static final byte SERIAL_SEG_FLT_MOVETO = 0x40;
-//  private static final byte SERIAL_SEG_FLT_LINETO = 0x41;
-//  private static final byte SERIAL_SEG_FLT_QUADTO = 0x42;
-//  private static final byte SERIAL_SEG_FLT_CUBICTO = 0x43;
-//
-//  private static final byte SERIAL_SEG_DBL_MOVETO = 0x50;
-//  private static final byte SERIAL_SEG_DBL_LINETO = 0x51;
-//  private static final byte SERIAL_SEG_DBL_QUADTO = 0x52;
-//  private static final byte SERIAL_SEG_DBL_CUBICTO = 0x53;
-//
-//  private static final byte SERIAL_SEG_CLOSE = 0x60;
-//  private static final byte SERIAL_PATH_END = 0x61;
+  // /*
+  // * Support fields and methods for serializing the subclasses.
+  // */
+  // private static final byte SERIAL_STORAGE_FLT_ARRAY = 0x30;
+  // private static final byte SERIAL_STORAGE_DBL_ARRAY = 0x31;
+  //
+  // private static final byte SERIAL_SEG_FLT_MOVETO = 0x40;
+  // private static final byte SERIAL_SEG_FLT_LINETO = 0x41;
+  // private static final byte SERIAL_SEG_FLT_QUADTO = 0x42;
+  // private static final byte SERIAL_SEG_FLT_CUBICTO = 0x43;
+  //
+  // private static final byte SERIAL_SEG_DBL_MOVETO = 0x50;
+  // private static final byte SERIAL_SEG_DBL_LINETO = 0x51;
+  // private static final byte SERIAL_SEG_DBL_QUADTO = 0x52;
+  // private static final byte SERIAL_SEG_DBL_CUBICTO = 0x53;
+  //
+  // private static final byte SERIAL_SEG_CLOSE = 0x60;
+  // private static final byte SERIAL_PATH_END = 0x61;
 
-//  final void writeObject(java.io.ObjectOutputStream s, boolean isdbl) throws java.io.IOException {
-//    s.defaultWriteObject();
-//
-//    float fCoords[];
-//    double dCoords[];
-//
-//    if (isdbl) {
-//      dCoords = ((Path2D.Double) this).doubleCoords;
-//      fCoords = null;
-//    } else {
-//      fCoords = ((Path2D.Float) this).floatCoords;
-//      dCoords = null;
-//    }
-//
-//    int numTypes = this.numTypes;
-//
-//    s.writeByte(isdbl ? SERIAL_STORAGE_DBL_ARRAY : SERIAL_STORAGE_FLT_ARRAY);
-//    s.writeInt(numTypes);
-//    s.writeInt(numCoords);
-//    s.writeByte((byte) windingRule);
-//
-//    int cindex = 0;
-//    for (int i = 0; i < numTypes; i++) {
-//      int npoints;
-//      byte serialtype;
-//      switch (pointTypes[i]){
-//        case SEG_MOVETO :
-//          npoints = 1;
-//          serialtype = (isdbl ? SERIAL_SEG_DBL_MOVETO : SERIAL_SEG_FLT_MOVETO);
-//          break;
-//        case SEG_LINETO :
-//          npoints = 1;
-//          serialtype = (isdbl ? SERIAL_SEG_DBL_LINETO : SERIAL_SEG_FLT_LINETO);
-//          break;
-//        case SEG_QUADTO :
-//          npoints = 2;
-//          serialtype = (isdbl ? SERIAL_SEG_DBL_QUADTO : SERIAL_SEG_FLT_QUADTO);
-//          break;
-//        case SEG_CUBICTO :
-//          npoints = 3;
-//          serialtype = (isdbl ? SERIAL_SEG_DBL_CUBICTO : SERIAL_SEG_FLT_CUBICTO);
-//          break;
-//        case SEG_CLOSE :
-//          npoints = 0;
-//          serialtype = SERIAL_SEG_CLOSE;
-//          break;
-//
-//        default :
-//          // Should never happen
-//          throw new InternalError("unrecognized path type");
-//      }
-//      s.writeByte(serialtype);
-//      while (--npoints >= 0) {
-//        if (isdbl) {
-//          s.writeDouble(dCoords[cindex++]);
-//          s.writeDouble(dCoords[cindex++]);
-//        } else {
-//          s.writeFloat(fCoords[cindex++]);
-//          s.writeFloat(fCoords[cindex++]);
-//        }
-//      }
-//    }
-//    s.writeByte((byte) SERIAL_PATH_END);
-//  }
-//
-//  final void readObject(java.io.ObjectInputStream s, boolean storedbl) throws java.lang.ClassNotFoundException,
-//      java.io.IOException {
-//    s.defaultReadObject();
-//
-//    // The subclass calls this method with the storage type that
-//    // they want us to use (storedbl) so we ignore the storage
-//    // method hint from the stream.
-//    s.readByte();
-//    int nT = s.readInt();
-//    int nC = s.readInt();
-//    try {
-//      setWindingRule(s.readByte());
-//    } catch (IllegalArgumentException iae) {
-//      throw new java.io.InvalidObjectException(iae.getMessage());
-//    }
-//
-//    pointTypes = new byte[(nT < 0) ? INIT_SIZE : nT];
-//    if (nC < 0) {
-//      nC = INIT_SIZE * 2;
-//    }
-//    if (storedbl) {
-//      ((Path2D.Double) this).doubleCoords = new double[nC];
-//    } else {
-//      ((Path2D.Float) this).floatCoords = new float[nC];
-//    }
-//
-//    PATHDONE : for (int i = 0; nT < 0 || i < nT; i++) {
-//      boolean isdbl;
-//      int npoints;
-//      byte segtype;
-//
-//      byte serialtype = s.readByte();
-//      switch (serialtype){
-//        case SERIAL_SEG_FLT_MOVETO :
-//          isdbl = false;
-//          npoints = 1;
-//          segtype = SEG_MOVETO;
-//          break;
-//        case SERIAL_SEG_FLT_LINETO :
-//          isdbl = false;
-//          npoints = 1;
-//          segtype = SEG_LINETO;
-//          break;
-//        case SERIAL_SEG_FLT_QUADTO :
-//          isdbl = false;
-//          npoints = 2;
-//          segtype = SEG_QUADTO;
-//          break;
-//        case SERIAL_SEG_FLT_CUBICTO :
-//          isdbl = false;
-//          npoints = 3;
-//          segtype = SEG_CUBICTO;
-//          break;
-//
-//        case SERIAL_SEG_DBL_MOVETO :
-//          isdbl = true;
-//          npoints = 1;
-//          segtype = SEG_MOVETO;
-//          break;
-//        case SERIAL_SEG_DBL_LINETO :
-//          isdbl = true;
-//          npoints = 1;
-//          segtype = SEG_LINETO;
-//          break;
-//        case SERIAL_SEG_DBL_QUADTO :
-//          isdbl = true;
-//          npoints = 2;
-//          segtype = SEG_QUADTO;
-//          break;
-//        case SERIAL_SEG_DBL_CUBICTO :
-//          isdbl = true;
-//          npoints = 3;
-//          segtype = SEG_CUBICTO;
-//          break;
-//
-//        case SERIAL_SEG_CLOSE :
-//          isdbl = false;
-//          npoints = 0;
-//          segtype = SEG_CLOSE;
-//          break;
-//
-//        case SERIAL_PATH_END :
-//          if (nT < 0) {
-//            break PATHDONE;
-//          }
-//          throw new StreamCorruptedException("unexpected PATH_END");
-//
-//        default :
-//          throw new StreamCorruptedException("unrecognized path type");
-//      }
-//      needRoom(segtype != SEG_MOVETO, npoints * 2);
-//      if (isdbl) {
-//        while (--npoints >= 0) {
-//          append(s.readDouble(), s.readDouble());
-//        }
-//      } else {
-//        while (--npoints >= 0) {
-//          append(s.readFloat(), s.readFloat());
-//        }
-//      }
-//      pointTypes[numTypes++] = segtype;
-//    }
-//    if (nT >= 0 && s.readByte() != SERIAL_PATH_END) {
-//      throw new StreamCorruptedException("missing PATH_END");
-//    }
-//  }
+  // final void writeObject(java.io.ObjectOutputStream s, boolean isdbl) throws java.io.IOException
+  // {
+  // s.defaultWriteObject();
+  //
+  // float fCoords[];
+  // double dCoords[];
+  //
+  // if (isdbl) {
+  // dCoords = ((Path2D.Double) this).doubleCoords;
+  // fCoords = null;
+  // } else {
+  // fCoords = ((Path2D.Float) this).floatCoords;
+  // dCoords = null;
+  // }
+  //
+  // int numTypes = this.numTypes;
+  //
+  // s.writeByte(isdbl ? SERIAL_STORAGE_DBL_ARRAY : SERIAL_STORAGE_FLT_ARRAY);
+  // s.writeInt(numTypes);
+  // s.writeInt(numCoords);
+  // s.writeByte((byte) windingRule);
+  //
+  // int cindex = 0;
+  // for (int i = 0; i < numTypes; i++) {
+  // int npoints;
+  // byte serialtype;
+  // switch (pointTypes[i]){
+  // case SEG_MOVETO :
+  // npoints = 1;
+  // serialtype = (isdbl ? SERIAL_SEG_DBL_MOVETO : SERIAL_SEG_FLT_MOVETO);
+  // break;
+  // case SEG_LINETO :
+  // npoints = 1;
+  // serialtype = (isdbl ? SERIAL_SEG_DBL_LINETO : SERIAL_SEG_FLT_LINETO);
+  // break;
+  // case SEG_QUADTO :
+  // npoints = 2;
+  // serialtype = (isdbl ? SERIAL_SEG_DBL_QUADTO : SERIAL_SEG_FLT_QUADTO);
+  // break;
+  // case SEG_CUBICTO :
+  // npoints = 3;
+  // serialtype = (isdbl ? SERIAL_SEG_DBL_CUBICTO : SERIAL_SEG_FLT_CUBICTO);
+  // break;
+  // case SEG_CLOSE :
+  // npoints = 0;
+  // serialtype = SERIAL_SEG_CLOSE;
+  // break;
+  //
+  // default :
+  // // Should never happen
+  // throw new InternalError("unrecognized path type");
+  // }
+  // s.writeByte(serialtype);
+  // while (--npoints >= 0) {
+  // if (isdbl) {
+  // s.writeDouble(dCoords[cindex++]);
+  // s.writeDouble(dCoords[cindex++]);
+  // } else {
+  // s.writeFloat(fCoords[cindex++]);
+  // s.writeFloat(fCoords[cindex++]);
+  // }
+  // }
+  // }
+  // s.writeByte((byte) SERIAL_PATH_END);
+  // }
+  //
+  // final void readObject(java.io.ObjectInputStream s, boolean storedbl) throws
+  // java.lang.ClassNotFoundException,
+  // java.io.IOException {
+  // s.defaultReadObject();
+  //
+  // // The subclass calls this method with the storage type that
+  // // they want us to use (storedbl) so we ignore the storage
+  // // method hint from the stream.
+  // s.readByte();
+  // int nT = s.readInt();
+  // int nC = s.readInt();
+  // try {
+  // setWindingRule(s.readByte());
+  // } catch (IllegalArgumentException iae) {
+  // throw new java.io.InvalidObjectException(iae.getMessage());
+  // }
+  //
+  // pointTypes = new byte[(nT < 0) ? INIT_SIZE : nT];
+  // if (nC < 0) {
+  // nC = INIT_SIZE * 2;
+  // }
+  // if (storedbl) {
+  // ((Path2D.Double) this).doubleCoords = new double[nC];
+  // } else {
+  // ((Path2D.Float) this).floatCoords = new float[nC];
+  // }
+  //
+  // PATHDONE : for (int i = 0; nT < 0 || i < nT; i++) {
+  // boolean isdbl;
+  // int npoints;
+  // byte segtype;
+  //
+  // byte serialtype = s.readByte();
+  // switch (serialtype){
+  // case SERIAL_SEG_FLT_MOVETO :
+  // isdbl = false;
+  // npoints = 1;
+  // segtype = SEG_MOVETO;
+  // break;
+  // case SERIAL_SEG_FLT_LINETO :
+  // isdbl = false;
+  // npoints = 1;
+  // segtype = SEG_LINETO;
+  // break;
+  // case SERIAL_SEG_FLT_QUADTO :
+  // isdbl = false;
+  // npoints = 2;
+  // segtype = SEG_QUADTO;
+  // break;
+  // case SERIAL_SEG_FLT_CUBICTO :
+  // isdbl = false;
+  // npoints = 3;
+  // segtype = SEG_CUBICTO;
+  // break;
+  //
+  // case SERIAL_SEG_DBL_MOVETO :
+  // isdbl = true;
+  // npoints = 1;
+  // segtype = SEG_MOVETO;
+  // break;
+  // case SERIAL_SEG_DBL_LINETO :
+  // isdbl = true;
+  // npoints = 1;
+  // segtype = SEG_LINETO;
+  // break;
+  // case SERIAL_SEG_DBL_QUADTO :
+  // isdbl = true;
+  // npoints = 2;
+  // segtype = SEG_QUADTO;
+  // break;
+  // case SERIAL_SEG_DBL_CUBICTO :
+  // isdbl = true;
+  // npoints = 3;
+  // segtype = SEG_CUBICTO;
+  // break;
+  //
+  // case SERIAL_SEG_CLOSE :
+  // isdbl = false;
+  // npoints = 0;
+  // segtype = SEG_CLOSE;
+  // break;
+  //
+  // case SERIAL_PATH_END :
+  // if (nT < 0) {
+  // break PATHDONE;
+  // }
+  // throw new StreamCorruptedException("unexpected PATH_END");
+  //
+  // default :
+  // throw new StreamCorruptedException("unrecognized path type");
+  // }
+  // needRoom(segtype != SEG_MOVETO, npoints * 2);
+  // if (isdbl) {
+  // while (--npoints >= 0) {
+  // append(s.readDouble(), s.readDouble());
+  // }
+  // } else {
+  // while (--npoints >= 0) {
+  // append(s.readFloat(), s.readFloat());
+  // }
+  // }
+  // pointTypes[numTypes++] = segtype;
+  // }
+  // if (nT >= 0 && s.readByte() != SERIAL_PATH_END) {
+  // throw new StreamCorruptedException("missing PATH_END");
+  // }
+  // }
 
   static abstract class Iterator implements PathIterator {
     int typeIdx;
