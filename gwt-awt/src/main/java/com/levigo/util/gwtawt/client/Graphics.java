@@ -2,7 +2,6 @@ package com.levigo.util.gwtawt.client;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Shape;
 
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -53,13 +52,13 @@ public interface Graphics {
    */
   public abstract void fill(Shape shape);
 
-  /**
-   * Sets this graphics context's font to the specified font. All subsequent text operations using
-   * this graphics context use this font. A null argument is silently ignored.
-   * 
-   * @param font the font.
-   */
-  public abstract void setFont(Font font);
+//  /**
+//   * Sets this graphics context's font to the specified font. All subsequent text operations using
+//   * this graphics context use this font. A null argument is silently ignored.
+//   * 
+//   * @param font the font.
+//   */
+//  public abstract void setFont(Font font);
 
   /**
    * Intersects the current clip with the specified rectangle. The resulting clipping area is the

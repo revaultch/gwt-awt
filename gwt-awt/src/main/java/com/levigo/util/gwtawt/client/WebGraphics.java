@@ -21,7 +21,6 @@ package com.levigo.util.gwtawt.client;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
 
@@ -178,11 +177,11 @@ public class WebGraphics implements Graphics {
   }
 
 
-  @Override
-  public void setFont(Font font) {
-    if (font != null && font.getFontName() != null)
-      context.setFont(font.getFontName());
-  }
+//  @Override
+//  public void setFont(Font font) {
+//    if (font != null && font.getFontName() != null)
+//      context.setFont(font.getFontName());
+//  }
 
   @Override
   public void clipRect(int x, int y, int width, int height) {
