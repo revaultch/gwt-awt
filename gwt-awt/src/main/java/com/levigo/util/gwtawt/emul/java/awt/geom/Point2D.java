@@ -397,16 +397,15 @@ public abstract class Point2D implements Cloneable {
 //        }
 //    }
 
-    //TODO
-//    /**
-//     * Returns the hashcode for this <code>Point2D</code>.
-//     * @return      a hash code for this <code>Point2D</code>.
-//     */
-//    public int hashCode() {
-//        long bits = java.lang.Double.doubleToLongBits(getX());
-//        bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
-//        return (((int) bits) ^ ((int) (bits >> 32)));
-//    }
+    /**
+     * Returns the hashcode for this <code>Point2D</code>.
+     * @return      a hash code for this <code>Point2D</code>.
+     */
+    public int hashCode() {
+        long bits = java.lang.Double.doubleToLongBits(getX());
+        bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+        return (((int) bits) ^ ((int) (bits >> 32)));
+    }
 
     /**
      * Determines whether or not two points are equal. Two instances of

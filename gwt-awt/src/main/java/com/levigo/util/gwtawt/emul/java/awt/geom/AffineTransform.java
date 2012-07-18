@@ -3704,21 +3704,20 @@ public class AffineTransform implements /*Cloneable,*/ java.io.Serializable {
   // throw new InternalError();
   // }
   // }
-  // TODO
-  // /**
-  // * Returns the hashcode for this transform.
-  // * @return a hash code for this transform.
-  // * @since 1.2
-  // */
-  // public int hashCode() {
-  // long bits = Double.doubleToLongBits(m00);
-  // bits = bits * 31 + Double.doubleToLongBits(m01);
-  // bits = bits * 31 + Double.doubleToLongBits(m02);
-  // bits = bits * 31 + Double.doubleToLongBits(m10);
-  // bits = bits * 31 + Double.doubleToLongBits(m11);
-  // bits = bits * 31 + Double.doubleToLongBits(m12);
-  // return (((int) bits) ^ ((int) (bits >> 32)));
-  // }
+   /**
+   * Returns the hashcode for this transform.
+   * @return a hash code for this transform.
+   * @since 1.2
+   */
+   public int hashCode() {
+     long bits = Double.doubleToLongBits(m00);
+     bits = bits * 31 + Double.doubleToLongBits(m01);
+     bits = bits * 31 + Double.doubleToLongBits(m02);
+     bits = bits * 31 + Double.doubleToLongBits(m10);
+     bits = bits * 31 + Double.doubleToLongBits(m11);
+     bits = bits * 31 + Double.doubleToLongBits(m12);
+     return (((int) bits) ^ ((int) (bits >> 32)));
+   }
 
   /**
    * Returns <code>true</code> if this <code>AffineTransform</code> represents the same affine

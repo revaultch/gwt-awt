@@ -96,6 +96,7 @@ import sun.awt.geom.AreaOp;
  *
  * @since 1.2
  */
+@SuppressWarnings("all")
 public class Area implements Shape/*, Cloneable*/ {
     private static Vector EmptyCurves = new Vector();
 
@@ -659,23 +660,24 @@ public class Area implements Shape/*, Cloneable*/ {
 
     @Override
     public boolean contains(double x, double y) {
-      // TODO Auto-generated method stub
+      assert(false) : "not implemented yet";
       return false;
     }
 
     @Override
     public boolean intersects(double x, double y, double w, double h) {
-      // TODO Auto-generated method stub
+      assert(false) : "not implemented yet";
       return false;
     }
 
     @Override
     public boolean contains(double x, double y, double w, double h) {
-      // TODO Auto-generated method stub
+      assert(false) : "not implemented yet";
       return false;
     }
 }
 
+@SuppressWarnings("all")
 class AreaIterator implements PathIterator {
     private AffineTransform transform;
     private Vector curves;

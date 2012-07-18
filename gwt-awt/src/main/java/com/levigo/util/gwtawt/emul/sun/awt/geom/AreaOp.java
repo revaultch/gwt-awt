@@ -32,6 +32,7 @@ import java.util.Arrays;
 
 import sun.awt.geom.Curve;
 
+@SuppressWarnings("all")
 public abstract class AreaOp {
     public static abstract class CAGOp extends AreaOp {
         boolean inLeft;

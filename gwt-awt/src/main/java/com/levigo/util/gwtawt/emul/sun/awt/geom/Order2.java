@@ -30,6 +30,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.QuadCurve2D;
 import java.util.Vector;
 
+@SuppressWarnings("all")
 final class Order2 extends Curve {
     private double x0;
     private double y0;

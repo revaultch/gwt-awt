@@ -342,25 +342,24 @@ public class BasicStroke implements Stroke {
     return dash_phase;
   }
 
-  //TODO
-//  /**
-//   * Returns the hashcode for this stroke.
-//   * 
-//   * @return a hash code for this stroke.
-//   */
-//  public int hashCode() {
-//    int hash = Float.floatToIntBits(width);
-//    hash = hash * 31 + join;
-//    hash = hash * 31 + cap;
-//    hash = hash * 31 + Float.floatToIntBits(miterlimit);
-//    if (dash != null) {
-//      hash = hash * 31 + Float.floatToIntBits(dash_phase);
-//      for (int i = 0; i < dash.length; i++) {
-//        hash = hash * 31 + Float.floatToIntBits(dash[i]);
-//      }
-//    }
-//    return hash;
-//  }
+  /**
+   * Returns the hashcode for this stroke.
+   * 
+   * @return a hash code for this stroke.
+   */
+  public int hashCode() {
+    int hash = Float.floatToIntBits(width);
+    hash = hash * 31 + join;
+    hash = hash * 31 + cap;
+    hash = hash * 31 + Float.floatToIntBits(miterlimit);
+    if (dash != null) {
+      hash = hash * 31 + Float.floatToIntBits(dash_phase);
+      for (int i = 0; i < dash.length; i++) {
+        hash = hash * 31 + Float.floatToIntBits(dash[i]);
+      }
+    }
+    return hash;
+  }
 
   /**
    * Returns true if this BasicStroke represents the same stroking operation as the given argument.

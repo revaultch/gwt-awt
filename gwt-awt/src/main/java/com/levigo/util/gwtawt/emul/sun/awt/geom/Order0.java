@@ -29,6 +29,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.PathIterator;
 import java.util.Vector;
 
+@SuppressWarnings("all")
 final class Order0 extends Curve {
     private double x;
     private double y;

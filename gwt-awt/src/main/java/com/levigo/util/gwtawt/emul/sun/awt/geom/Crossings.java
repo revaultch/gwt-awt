@@ -29,6 +29,7 @@ import java.awt.geom.PathIterator;
 import java.util.Vector;
 import java.util.Enumeration;
 
+@SuppressWarnings("all")
 public abstract class Crossings {
     public static final boolean debug = false;
 

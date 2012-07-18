@@ -34,6 +34,7 @@ import java.awt.geom.IllegalPathStateException;
 import java.util.Vector;
 import java.lang.Math;
 
+@SuppressWarnings("all")
 public abstract class Curve {
     public static final int INCREASING = 1;
     public static final int DECREASING = -1;
