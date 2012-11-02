@@ -1,28 +1,58 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.levigo.util</groupId>
+	<groupId>com.levigo</groupId>
 	<artifactId>gwt-awt</artifactId>
+	<packaging>jar</packaging>
+	<name>GWT-AWT</name>
 	<version>0.0.1-SNAPSHOT</version>
+	<description>An emulation of Java's AWT, based on OpenJDK.</description>
+	<url>http://code.google.com/p/gwt-awt/</url>
+
+	<licenses>
+		<license>
+			<name>GPLv2 with Classpath Exception</name>
+			<url>http://openjdk.java.net/legal/gplv2+ce.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<gwt.version>2.5.0</gwt.version>
+	</properties>
+
+	<scm>
+		<connection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</connection>
+		<developerConnection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</developerConnection>
+		<url>http://gwt-awt.googlecode.com/git/gwt-awt/</url>
+	</scm>
+
+	<organization>
+		<name>levigo</name>
+		<url>http://www.levigo.de/</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>s.wokusch</id>
+			<name>Stefan Wokusch</name>
+			<email>gwtawt@wokusch.de</email>
+		</developer>
+		<developer>
+			<id>d.waas</id>
+			<name>Dominik Waas</name>
+			<email>d.waas@levigo.de</email>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>2.5.0-rc1</version>
+			<version>${gwt.version}</version>
 		</dependency>
 	</dependencies>
-
-	<distributionManagement>
-		<repository>
-			<id>maven2.releases.levigo.de</id>
-			<url>https://levigo.de/maven2/content/repositories/levigo-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>maven2.snapshots.levigo.de</id>
-			<url>https://levigo.de/maven2/content/repositories/levigo-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<build>
 		<plugins>
@@ -63,7 +93,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>2.5.0-rc1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -72,9 +102,24 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.gwt</groupId>
+						<artifactId>gwt-user</artifactId>
+						<version>${gwt.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>com.google.gwt</groupId>
+						<artifactId>gwt-dev</artifactId>
+						<version>${gwt.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>com.google.gwt</groupId>
+						<artifactId>gwt-codeserver</artifactId>
+						<version>${gwt.version}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
-
-
 </project>
