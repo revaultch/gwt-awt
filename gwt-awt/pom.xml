@@ -5,15 +5,9 @@
 	<artifactId>gwt-awt</artifactId>
 	<packaging>jar</packaging>
 	<name>GWT-AWT</name>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<description>An emulation of Java's AWT, based on OpenJDK.</description>
 	<url>http://code.google.com/p/gwt-awt/</url>
-
-<!-- 	<parent> -->
-<!-- 		<groupId>org.sonatype.oss</groupId> -->
-<!-- 		<artifactId>oss-parent</artifactId> -->
-<!-- 		<version>7</version> -->
-<!-- 	</parent> -->
 
 	<licenses>
 		<license>
@@ -33,6 +27,7 @@
 		<connection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</connection>
 		<developerConnection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</developerConnection>
 		<url>http://gwt-awt.googlecode.com/git/gwt-awt/</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<organization>
@@ -60,6 +55,19 @@
 			<version>${gwt.version}</version>
 		</dependency>
 	</dependencies>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<plugins>
@@ -140,11 +148,20 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<preparationGoals>clean</preparationGoals>
+					<!-- <pushChanges>false</pushChanges> -->
+					<!-- <localCheckout>true</localCheckout> -->
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
-			<!-- signing and deploying the artifact to Sonatype OSS Repository -->
 			<id>release-sign-artifacts</id>
 			<activation>
 				<property>
