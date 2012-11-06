@@ -9,11 +9,11 @@
 	<description>An emulation of Java's AWT, based on OpenJDK.</description>
 	<url>http://code.google.com/p/gwt-awt/</url>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
+<!-- 	<parent> -->
+<!-- 		<groupId>org.sonatype.oss</groupId> -->
+<!-- 		<artifactId>oss-parent</artifactId> -->
+<!-- 		<version>7</version> -->
+<!-- 	</parent> -->
 
 	<licenses>
 		<license>
@@ -113,7 +113,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.5.0-rc1</version>
+				<version>2.5.0</version>
 				<executions>
 					<execution>
 						<goals>
