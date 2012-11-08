@@ -153,6 +153,8 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
+					<username>${gwt-awt.googlecode.username}</username>
+					<password>${gwt-awt.googlecode.password}</password>
 					<preparationGoals>clean</preparationGoals>
 					<!-- <pushChanges>false</pushChanges> -->
 					<!-- <localCheckout>true</localCheckout> -->
@@ -175,6 +177,11 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.1</version>
+						<configuration>
+              <homedir>${gwt-awt.gpg.homedir}</homedir>
+							<keyname>${gwt-awt.gpg.keyname}</keyname>
+							<passphrase>${gwt-awt.gpg.passphrase}</passphrase>
+						</configuration>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
