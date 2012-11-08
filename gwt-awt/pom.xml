@@ -24,9 +24,9 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</connection>
-		<developerConnection>scm:git:http://gwt-awt.googlecode.com/git/gwt-awt/</developerConnection>
-		<url>http://gwt-awt.googlecode.com/git/gwt-awt/</url>
+		<connection>scm:git:https://code.google.com/p/gwt-awt/</connection>
+		<developerConnection>scm:git:https://code.google.com/p/gwt-awt/</developerConnection>
+		<url>https://code.google.com/p/gwt-awt/</url>
 		<tag>HEAD</tag>
 	</scm>
 
