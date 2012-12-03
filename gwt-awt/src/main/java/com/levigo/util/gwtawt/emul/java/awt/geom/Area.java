@@ -100,7 +100,7 @@ import sun.awt.geom.AreaOp;
 public class Area implements Shape/*, Cloneable*/ {
     private static Vector EmptyCurves = new Vector();
 
-    private Vector curves;
+    private Vector<Curve> curves;
 
     /**
      * Default constructor which creates an empty area.
