@@ -4,4 +4,5 @@
   <inherits name="com.levigo.util.gwtawt.emul.Emul"/>
   
   <source path="gwtawt/client"/>
+  <source path="gwtawt/shared"/>
 </module>
