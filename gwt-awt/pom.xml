@@ -125,7 +125,6 @@
 					<execution>
 						<goals>
 							<goal>resources</goal>
-							<goal>test</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -177,7 +176,7 @@
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.1</version>
 						<configuration>
-              <homedir>${gwt-awt.gpg.homedir}</homedir>
+							<homedir>${gwt-awt.gpg.homedir}</homedir>
 							<keyname>${gwt-awt.gpg.keyname}</keyname>
 							<passphrase>${gwt-awt.gpg.passphrase}</passphrase>
 						</configuration>
