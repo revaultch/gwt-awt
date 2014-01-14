@@ -1116,7 +1116,7 @@ public abstract class Arc2D extends RectangularShape {
             if (angle <= (180.0 + 360.0)) {
                 angle = angle - 360.0;
             } else {
-                angle = Math.IEEEremainder(angle, 360.0);
+                angle = com.levigo.util.gwtawt.client.helper.Math.IEEEremainder(angle, 360.0);
                 // IEEEremainder can return -180 here for some input values...
                 if (angle == -180.0) {
                     angle = 180.0;
@@ -1126,7 +1126,7 @@ public abstract class Arc2D extends RectangularShape {
             if (angle > (-180.0 - 360.0)) {
                 angle = angle + 360.0;
             } else {
-                angle = Math.IEEEremainder(angle, 360.0);
+                angle = com.levigo.util.gwtawt.client.helper.Math.IEEEremainder(angle, 360.0);
                 // IEEEremainder can return -180 here for some input values...
                 if (angle == -180.0) {
                     angle = 180.0;
