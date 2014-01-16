@@ -128,9 +128,6 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<failOnError>true</failOnError>
-				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>com.google.gwt</groupId>
