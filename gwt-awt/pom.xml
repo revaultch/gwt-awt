@@ -4,7 +4,7 @@
 	<artifactId>gwt-awt</artifactId>
 	<packaging>jar</packaging>
 	<name>GWT-AWT</name>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<description>An emulation of Java's AWT, based on OpenJDK.</description>
 	<url>http://code.google.com/p/gwt-awt/</url>
 
@@ -26,7 +26,7 @@
 		<connection>scm:git:https://code.google.com/p/gwt-awt/</connection>
 		<developerConnection>scm:git:https://code.google.com/p/gwt-awt/</developerConnection>
 		<url>https://code.google.com/p/gwt-awt/</url>
-		<tag>gwt-awt-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<organization>
