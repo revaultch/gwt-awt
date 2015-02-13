@@ -5,3 +5,7 @@ target
 .project
 .settings
 test-output
+
+# exclude IntelliJ IDEA files
+.idea
+**/*.iml
